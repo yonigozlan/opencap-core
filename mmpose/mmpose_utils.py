@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def frame_iter(capture):
     while capture.grab():
         yield capture.retrieve()[1]
@@ -9,7 +10,7 @@ def frame_iter(capture):
 class LoadImage:
     """Simple pipeline step to check channel order"""
 
-    def __init__(self, color_type='color', channel_order='rgb'):
+    def __init__(self, color_type="color", channel_order="rgb"):
         self.color_type = color_type
         self.channel_order = channel_order
 
@@ -20,10 +21,10 @@ class LoadImage:
         Returns:
             dict: ``data`` will be returned containing loaded image.
         """
-	#data['image_file'] = ''
-        if self.color_type == 'color' and self.channel_order == 'rgb':
-            img = cv2.cvtColor(data['img'], cv2.COLOR_BGR2RGB)
-        data['img'] = img
+        # data['image_file'] = ''
+        if self.color_type == "color" and self.channel_order == "rgb":
+            img = cv2.cvtColor(data["img"], cv2.COLOR_BGR2RGB)
+        data["img"] = img
         return data
 
 
@@ -52,7 +53,8 @@ def _box2cs(cfg, box):
         - np.ndarray[float32](2,): Scale of the bbox w & h.
     """
     x, y, w, h = box[:4]
-    input_size = cfg.data_cfg['image_size']
+    # input_size = cfg.data_cfg["image_size"]
+    input_size = cfg.codec["input_size"]
     aspect_ratio = input_size[0] / input_size[1]
     center = np.array([x + w * 0.5, y + h * 0.5], dtype=np.float32)
 
@@ -77,16 +79,21 @@ def concat(instances):
     """
     assert len(instances) > 0, "Empty instances inputted"
 
+    print("keys", instances[0].keys())
+    print("pred_instances", instances[0].pred_instances.shape)
     results = {}
     keys = list(instances[0].keys())
 
     for k in keys:
         if type(instances[0][k]) is list:
             list_len = len(instances[0][k])
-            results[k] = [np.concatenate([instance[k][i] for instance in instances]) for i in range(list_len)]
+            results[k] = [
+                np.concatenate([instance[k][i] for instance in instances])
+                for i in range(list_len)
+            ]
         else:
             results[k] = np.concatenate([instance[k] for instance in instances])
-    
+
     return results
 
 
@@ -119,12 +126,16 @@ def process_mmdet_results(mmdet_results, cat_id=1):
         det_results = mmdet_results[0]
     else:
         det_results = mmdet_results
-
-    bboxes = det_results[cat_id - 1]
+    pred_instances = det_results.pred_instances.cpu().numpy()
+    bboxes = np.concatenate(
+        (pred_instances.bboxes, pred_instances.scores[:, None]), axis=1
+    )
+    bboxes = bboxes[pred_instances.labels == cat_id - 1, :]
+    # bboxes = det_results[cat_id - 1]
     person_results = []
     for bbox in bboxes:
         person = {}
-        person['bbox'] = bbox
+        person["bbox"] = bbox
         person_results.append(person)
 
     return person_results
