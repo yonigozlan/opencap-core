@@ -138,12 +138,6 @@
 					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 					<weight>5</weight>
 				</IKMarkerTask>
-				<IKMarkerTask name="r_lelbow">
-					<!--Whether or not this task will be used during inverse kinematics solve.-->
-					<apply>true</apply>
-					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-					<weight>5</weight>
-				</IKMarkerTask>
 				<IKMarkerTask name="r_lwrist">
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
 					<apply>true</apply>
@@ -157,12 +151,6 @@
 					<weight>5</weight>
 				</IKMarkerTask>
 				<IKMarkerTask name="l_melbow">
-					<!--Whether or not this task will be used during inverse kinematics solve.-->
-					<apply>true</apply>
-					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-					<weight>5</weight>
-				</IKMarkerTask>
-				<IKMarkerTask name="l_lelbow">
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
 					<apply>true</apply>
 					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->

@@ -68,17 +68,17 @@ def main(
 ):
     # %% High-level settings.
     # Camera calibration.
-    runCameraCalibration = False
+    runCameraCalibration = True
     # Pose detection.
-    runPoseDetection = False
+    runPoseDetection = True
     # Video Synchronization.
-    runSynchronization = False
+    runSynchronization = True
     # Triangulation.
-    runTriangulation = False
+    runTriangulation = True
     # Marker augmentation.
     runMarkerAugmentation = False
     # OpenSim pipeline.
-    runOpenSimPipeline = True
+    runOpenSimPipeline = False
     # Lowpass filter frequency of 2D keypoints for gait and everything else.
     filtFreqs = {"gait": 12, "default": 500}  # defaults to framerate/2
     # High-resolution for OpenPose.
@@ -465,6 +465,8 @@ def main(
             # If offset, no need to offset again for the webapp visualization.
             # (0.01 so that there is no overall offset, see utilsOpenSim).
             vertical_offset = 0.01
+    else:
+        vertical_offset = 0
 
     # %% OpenSim pipeline.
     if runOpenSimPipeline:
