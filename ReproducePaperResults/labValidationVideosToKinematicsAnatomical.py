@@ -75,12 +75,12 @@ dataDir = "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data"
 # includes walking trials. The sessions are named <subject_name>_Session0 and
 # <subject_name>_Session1.
 sessionNames = [
-    "subject2_Session0",
-    "subject2_Session1",
+    # "subject2_Session0",
+    # "subject2_Session1",
     # "subject3_Session0",
     # "subject3_Session1",
-    # "subject4_Session0",
-    # "subject4_Session1",
+    "subject4_Session0",
+    "subject4_Session1",
     # "subject5_Session0",
     # "subject5_Session1",
     # "subject6_Session0",
@@ -121,7 +121,7 @@ augmenter_model = "v0.2"
 # flip the flag to True.
 overwriteRestructuring = False
 # subjects = ["subject" + str(i) for i in range(2, 12)]
-subjects = ["subject2"]
+subjects = ["subject4"]
 for subject in subjects:
     pathSubject = os.path.join(dataDir, subject)
     pathVideos = os.path.join(pathSubject, "VideoData")
@@ -153,10 +153,12 @@ for subject in subjects:
                 pathTrial = os.path.join(pathCam, trial)
                 if not os.path.isdir(pathTrial):
                     continue
-                pathVideo = os.path.join(pathTrial, trial + ".avi")
+                suffix = "" if "extrinsics" in trial else "_syncdWithMocap"
+                pathVideo = os.path.join(pathTrial, trial + f"{suffix}.avi")
                 pathTrialNew = os.path.join(pathInputMediaNew, trial)
+                print("pathTrialNew", pathTrialNew)
                 os.makedirs(pathTrialNew, exist_ok=True)
-                shutil.copy2(pathVideo, pathTrialNew)
+                shutil.copy2(pathVideo, os.path.join(pathTrialNew, trial + ".avi"))
             # Copy camera parameters
             pathParameters = os.path.join(pathCam, "cameraIntrinsicsExtrinsics.pickle")
             shutil.copy2(pathParameters, pathCamNew)
@@ -262,14 +264,16 @@ for count, sessionName in enumerate(sessionNames):
                 camDir_0 = os.path.join(
                     sessionDir_0,
                     "OpenSimData",
-                    poseDetector + "_" + resolutionPoseDetection,
+                    # poseDetector + "_" + resolutionPoseDetection,
+                    poseDetector + "_0.8",
                     cameraSetup,
                 )
                 modelDir_0 = os.path.join(camDir_0, "Model")
                 camDir_1 = os.path.join(
                     sessionDir,
                     "OpenSimData",
-                    poseDetector + "_" + resolutionPoseDetection,
+                    # poseDetector + "_" + resolutionPoseDetection,
+                    poseDetector + "_0.8",
                     cameraSetup,
                 )
                 modelDir_1 = os.path.join(camDir_1, "Model")

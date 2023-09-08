@@ -65,10 +65,8 @@ def runScaleTool(
         raise ValueError("Unknown model type: scaling")
     pathMarkerSet = os.path.join(dirGenericModel, markerSetFileName)
 
-    print("pathMarkerSet", pathMarkerSet)
     # Add the marker set to the generic model and save that updated model.
     opensim.Logger.setLevelString("error")
-    print("pathGenericModel", pathGenericModel)
     genericModel = opensim.Model(pathGenericModel)
     markerSet = opensim.MarkerSet(pathMarkerSet)
     genericModel.set_MarkerSet(markerSet)
@@ -79,7 +77,6 @@ def runScaleTool(
     timeRange_os.insert(1, timeRange[-1])
 
     # Setup scale tool.
-    print("pathGenericSetupFile", pathGenericSetupFile)
     scaleTool = opensim.ScaleTool(pathGenericSetupFile)
     scaleTool.setName(scaledModelName)
     scaleTool.setSubjectMass(subjectMass)
@@ -160,15 +157,11 @@ def runScaleTool(
     scale_factors = np.zeros((nBodies, 3))
     for i in range(nBodies):
         bodyName = bodySet.get(i).getName()
-        print(bodyName)
         body = bodySet.get(bodyName)
         attached_geometry = body.get_attached_geometry(0)
-        print(attached_geometry)
-        print(attached_geometry.get_scale_factors().to_numpy())
         scale_factors[i, :] = attached_geometry.get_scale_factors().to_numpy()
-    print("scale factors: ", scale_factors)
+    # print("scale factors: ", scale_factors)
     diff_scale = np.max(np.max(scale_factors, axis=0) - np.min(scale_factors, axis=0))
-    print(np.max(scale_factors, axis=0), np.min(scale_factors, axis=0))
     # A difference in scaling factor larger than 1 would indicate that a
     # segment (e.g., humerus) would be more than twice as large as its generic
     # counterpart, whereas another segment (e.g., pelvis) would have the same
@@ -262,11 +255,10 @@ def getScaleTimeRange(
             "l_lelbow",
             "r_melbow",
             "l_melbow",
-            "r_mwrist",
-            "l_mwrist",
             "r_lwrist",
             "l_lwrist",
-            "C7",
+            "r_mwrist",
+            "l_mwrist",
             "r_ASIS",
             "l_ASIS",
             "r_PSIS",
@@ -283,6 +275,30 @@ def getScaleTimeRange(
             "l_5meta",
             "r_toe",
             "l_toe",
+            "r_big_toe",
+            "l_big_toe",
+            "l_calc",
+            "r_calc",
+            "r_bpinky",
+            "l_bpinky",
+            "r_tpinky",
+            "l_tpinky",
+            "r_bindex",
+            "l_bindex",
+            "r_tindex",
+            "l_tindex",
+            "r_tmiddle",
+            "l_tmiddle",
+            "r_tring",
+            "l_tring",
+            "r_bthumb",
+            "l_bthumb",
+            "r_tthumb",
+            "l_tthumb",
+            "C7",
+            "L2",
+            "T11",
+            "T6",
         ]
     else:
         markers = [

@@ -127,7 +127,6 @@ def pose_inference_updated(
         with torch.no_grad():
             # result = run_pose_inference(model, batch)
             results = model.test_step(batch)
-            print("results", results)
         instances += results
 
     # concat results and transform to per frame format

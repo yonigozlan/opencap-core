@@ -8,12 +8,8 @@ import time
 import cv2
 import numpy as np
 from decouple import config
-from utils import (
-    getMMposeAnatomicalMarkerNames,
-    getMMposeMarkerNames,
-    getOpenPoseMarkerNames,
-    getVideoExtension,
-)
+from utils import (getMMposeAnatomicalMarkerNames, getMMposeMarkerNames,
+                   getOpenPoseMarkerNames, getVideoExtension)
 from utilsChecker import getVideoRotation
 
 
@@ -304,7 +300,7 @@ def runMMposeVideo(
     model_config_person="demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
     model_ckpt_person="https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
     model_config_pose="configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_eval_rich-384x288_pretrained.py",
-    model_ckpt_pose="pretrain/hrnet/best_infinity_AP_epoch_24.pth",
+    model_ckpt_pose="pretrain/hrnet/best_infinity_AP_epoch_21.pth",
 ):
     trialPrefix, _ = os.path.splitext(os.path.basename(fileName))
     videoFullPath = os.path.normpath(os.path.join(cameraDirectory, fileName))
@@ -482,7 +478,7 @@ def arrangeMMposeAnatomicalPkl(poseInferencePklPath, outputPklPath):
         data4people = []
         for c, person in enumerate(frame):
             coordinates = person["pred_instances"]["keypoints"][0, 17:, :]
-            c_coord_out = np.zeros((36 * 3,))
+            c_coord_out = np.zeros((51 * 3,))
             for c_m, marker in enumerate(markersMMposeAnatomical):
                 c_coord = [coordinates[c_m][0], coordinates[c_m][1]]
                 c_coord.append(person["pred_instances"]["keypoint_scores"][0][c_m])

@@ -12,34 +12,19 @@ import os
 import traceback
 
 import numpy as np
+import scipy
 import yaml
-from utils import (
-    getDataDirectory,
-    getMMposeDirectory,
-    getOpenPoseDirectory,
-    getVideoExtension,
-    importMetadata,
-    loadCameraParameters,
-)
+from utils import (getDataDirectory, getMMposeDirectory, getOpenPoseDirectory,
+                   getVideoExtension, importMetadata, loadCameraParameters)
 from utilsAugmenter import augmentTRC
-from utilsChecker import (
-    autoSelectExtrinsicSolution,
-    calcExtrinsicsFromVideo,
-    isCheckerboardUpsideDown,
-    popNeutralPoseImages,
-    rotateIntrinsics,
-    saveCameraParameters,
-    synchronizeVideos,
-    triangulateMultiviewVideo,
-    writeTRCfrom3DKeypoints,
-)
+from utilsChecker import (autoSelectExtrinsicSolution, calcExtrinsicsFromVideo,
+                          isCheckerboardUpsideDown, popNeutralPoseImages,
+                          rotateIntrinsics, saveCameraParameters,
+                          synchronizeVideos, triangulateMultiviewVideo,
+                          writeTRCfrom3DKeypoints)
 from utilsDetector import runPoseDetector
-from utilsOpenSim import (
-    generateVisualizerJson,
-    getScaleTimeRange,
-    runIKTool,
-    runScaleTool,
-)
+from utilsOpenSim import (generateVisualizerJson, getScaleTimeRange, runIKTool,
+                          runScaleTool)
 
 
 def main(
@@ -65,6 +50,7 @@ def main(
     dataDir=None,
     overwriteAugmenterModel=False,
     useAnatomicalMarkers=True,
+    runUpsampling=True,
 ):
     # %% High-level settings.
     # Camera calibration.
@@ -78,7 +64,7 @@ def main(
     # Marker augmentation.
     runMarkerAugmentation = False
     # OpenSim pipeline.
-    runOpenSimPipeline = False
+    runOpenSimPipeline = True
     # Lowpass filter frequency of 2D keypoints for gait and everything else.
     filtFreqs = {"gait": 12, "default": 500}  # defaults to framerate/2
     # High-resolution for OpenPose.
@@ -356,6 +342,7 @@ def main(
                     data collection and https://www.opencap.ai/troubleshooting for
                     potential causes for a failed trial."""
                 raise Exception(exception, traceback.format_exc())
+        print("startEndFrames", startEndFrames)
 
     if scaleModel and calibrationOptions is not None and alternateExtrinsics is None:
         # Automatically select the camera calibration to use
@@ -389,22 +376,55 @@ def main(
 
         if useAnatomicalMarkers:
             if keypoints3D.shape[2] < 10:
-                keypoints3D = np.zeros((3, 36, 10))
-                confidence3D = np.zeros((1, 36, 10))
+                keypoints3D = np.zeros((3, 51, 10))
+                confidence3D = np.zeros((1, 51, 10))
         else:
             # Return 0s if not enough data.
             if keypoints3D.shape[2] < 10:
                 keypoints3D = np.zeros((3, 25, 10))
                 confidence3D = np.zeros((1, 25, 10))
 
-        # Write TRC.
-        writeTRCfrom3DKeypoints(
-            keypoints3D,
-            pathOutputFiles[trialName],
-            keypointNames,
-            frameRate=frameRate,
-            rotationAngles=rotationAngles,
-        )
+        if runUpsampling:
+            keypoints3D_res = np.empty(
+                (keypoints3D.shape[2], keypoints3D.shape[0] * keypoints3D.shape[1])
+            )
+            for iFrame in range(keypoints3D.shape[2]):
+                keypoints3D_res[iFrame, :] = np.reshape(
+                    keypoints3D[:, :, iFrame],
+                    (1, keypoints3D.shape[0] * keypoints3D.shape[1]),
+                    "F",
+                )
+            # Upsample to 100 Hz.
+            newTime = np.arange(0,np.round(len(keypoints3D_res)/frameRate+1/100,6),1/100)
+            interpFxn = scipy.interpolate.interp1d([i/frameRate for i in range(len(keypoints3D_res))],keypoints3D_res,axis=0,fill_value='extrapolate')
+            keypoints3D_res_interp = interpFxn(newTime)
+            keypoints3D_interp = np.empty((keypoints3D.shape[0], keypoints3D.shape[1], len(newTime)))
+            for iFrame in range(len(newTime)):
+                keypoints3D_interp[:, :, iFrame] = np.reshape(
+                    keypoints3D_res_interp[iFrame, :],
+                    (keypoints3D.shape[0], keypoints3D.shape[1]),
+                    "F",
+                )
+
+            # Write TRC.
+            writeTRCfrom3DKeypoints(
+                keypoints3D_interp,
+                pathOutputFiles[trialName],
+                keypointNames,
+                frameRate=100,
+                rotationAngles=rotationAngles,
+            )
+        else:
+            # Write TRC.
+            writeTRCfrom3DKeypoints(
+                keypoints3D,
+                pathOutputFiles[trialName],
+                keypointNames,
+                frameRate=frameRate,
+                rotationAngles=rotationAngles,
+            )
+
+
 
     # %% Augmentation.
     # Create output folder.
@@ -513,7 +533,7 @@ def main(
             try:
                 timeRange4Scaling = getScaleTimeRange(
                     pathTRCFile4Scaling,
-                    thresholdPosition=0.1,
+                    thresholdPosition=0.05,
                     thresholdTime=0.1,
                     removeRoot=True,
                     withAnatomicalMarkers=useAnatomicalMarkers,
@@ -559,7 +579,9 @@ def main(
             )
             if os.path.exists(pathScaledModel):
                 # Path setup file.
-                genericSetupFile4IKName = "Setup_IK{}.xml".format(suffix_model)
+                genericSetupFile4IKName = "Setup_IK_mmpose_anatomical{}.xml".format(
+                    suffix_model
+                )
                 pathGenericSetupFile4IK = os.path.join(
                     openSimPipelineDir, "IK", genericSetupFile4IKName
                 )

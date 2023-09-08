@@ -78,9 +78,6 @@ def concat(instances):
         result dict(array): dict of saved outputs
     """
     assert len(instances) > 0, "Empty instances inputted"
-
-    print("keys", instances[0].keys())
-    print("pred_instances", instances[0].pred_instances.shape)
     results = {}
     keys = list(instances[0].keys())
 

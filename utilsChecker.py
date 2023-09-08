@@ -1107,6 +1107,7 @@ def synchronizeVideoKeypoints(
     trialName=None,
     trialID="",
     useAnatomicalMarkers=True,
+    bypassSync=True,
 ):
     visualize2Dkeypoint = False  # this is a visualization just for testing what filtered input data looks like
 
@@ -1152,6 +1153,7 @@ def synchronizeVideoKeypoints(
                 mkrDict["r_5meta"],
                 mkrDict["r_toe"],
                 mkrDict["r_big_toe"],
+                mkrDict["r_calc"],
             ],
             "left": [
                 mkrDict["l_ankle"],
@@ -1159,6 +1161,7 @@ def synchronizeVideoKeypoints(
                 mkrDict["l_5meta"],
                 mkrDict["l_toe"],
                 mkrDict["l_big_toe"],
+                mkrDict["l_calc"],
             ],
         }
         armMkrs = {
@@ -1167,16 +1170,16 @@ def synchronizeVideoKeypoints(
                 mkrDict["r_melbow"],
                 mkrDict["r_mwrist"],
                 mkrDict["r_lwrist"],
-                mkrDict["r_pinky"],
-                mkrDict["r_index"],
+                mkrDict["r_bpinky"],
+                mkrDict["r_bindex"],
             ],
             "left": [
                 mkrDict["l_lelbow"],
                 mkrDict["l_melbow"],
                 mkrDict["l_mwrist"],
                 mkrDict["l_lwrist"],
-                mkrDict["l_pinky"],
-                mkrDict["l_index"],
+                mkrDict["l_bpinky"],
+                mkrDict["l_bindex"],
             ],
         }
     else:
@@ -1388,92 +1391,116 @@ def synchronizeVideoKeypoints(
 
     # find nSample shift relative to the first camera
     # nSamps = keypointList[0].shape[1]
-    shiftVals = []
-    shiftVals.append(0)
-    timeVecs = []
-    tStartEndVec = np.zeros((len(keypointList), 2))
-    for iCam, vertVel in enumerate(vertVelList):
-        timeVecs.append(np.arange(keypointList[iCam].shape[1]))
-        if iCam > 0:
-            # if no keypoints in Cam0 or the camera of interest, do not use cross_corr to sync.
-            if (
-                np.max(np.abs(vertVelList[iCam])) == 0
-                or np.max(np.abs(vertVelList[0])) == 0
-            ):
-                lag = 0
-            elif syncActivity == "general":
-                dataForReproj = {
-                    "CamParamList": c_CameraParams,
-                    "keypointList": keypointListFilt,
-                    "cams2UseReproj": [0, c_cameras2Use.index(c_cameras2Use[iCam])],
-                    "confidence": confidenceSyncListFilt,
-                    "cameras2Use": c_cameras2Use,
-                }
-                corVal, lag = cross_corr(
-                    vertVel,
-                    vertVelList[0],
-                    multCorrGaussianStd=maxShiftSteps / 2,
-                    visualize=False,
-                    dataForReproj=dataForReproj,
-                )  # gaussian curve gets multipled by correlation plot - helping choose the smallest shift value for periodic motions
-            elif syncActivity == "gait":
-                dataForReproj = {
-                    "CamParamList": c_CameraParams,
-                    "keypointList": keypointListFilt,
-                    "cams2UseReproj": [0, c_cameras2Use.index(c_cameras2Use[iCam])],
-                    "confidence": confidenceSyncListFilt,
-                    "cameras2Use": c_cameras2Use,
-                }
-                corVal, lag = cross_corr_multiple_timeseries(
-                    mkrSpeedList[iCam],
-                    mkrSpeedList[0],
-                    multCorrGaussianStd=maxShiftSteps / 2,
-                    dataForReproj=dataForReproj,
-                    visualize=False,
-                )
-            elif syncActivity == "handPunch":
-                corVal, lag = syncHandPunch(
-                    [handPunchVertPositionList[i] for i in [0, iCam]],
-                    handForPunch,
-                    maxShiftSteps=maxShiftSteps,
-                )
-            if (
-                np.abs(lag) > maxShiftSteps
-            ):  # if this fails and we get a lag greater than maxShiftSteps (units=timesteps)
-                lag = 0
-                print(
-                    "Did not use cross correlation to sync {} - computed shift was greater than specified {} frames. Shift set to 0.".format(
-                        c_cameras2Use[iCam], maxShiftSteps
+    if bypassSync:
+        shiftVals = [0 for _ in range(len(vertVelList))]
+        timeVecs = [
+            np.arange(keypointList[iCam].shape[1]) for iCam in range(len(vertVelList))
+        ]
+    else:
+        shiftVals = []
+        shiftVals.append(0)
+        timeVecs = []
+        tStartEndVec = np.zeros((len(keypointList), 2))
+        for iCam, vertVel in enumerate(vertVelList):
+            timeVecs.append(np.arange(keypointList[iCam].shape[1]))
+            if iCam > 0:
+                # if no keypoints in Cam0 or the camera of interest, do not use cross_corr to sync.
+                if (
+                    np.max(np.abs(vertVelList[iCam])) == 0
+                    or np.max(np.abs(vertVelList[0])) == 0
+                ):
+                    lag = 0
+                elif syncActivity == "general":
+                    dataForReproj = {
+                        "CamParamList": c_CameraParams,
+                        "keypointList": keypointListFilt,
+                        "cams2UseReproj": [0, c_cameras2Use.index(c_cameras2Use[iCam])],
+                        "confidence": confidenceSyncListFilt,
+                        "cameras2Use": c_cameras2Use,
+                    }
+                    corVal, lag = cross_corr(
+                        vertVel,
+                        vertVelList[0],
+                        multCorrGaussianStd=maxShiftSteps / 2,
+                        visualize=False,
+                        dataForReproj=dataForReproj,
+                    )  # gaussian curve gets multipled by correlation plot - helping choose the smallest shift value for periodic motions
+                elif syncActivity == "gait":
+                    dataForReproj = {
+                        "CamParamList": c_CameraParams,
+                        "keypointList": keypointListFilt,
+                        "cams2UseReproj": [0, c_cameras2Use.index(c_cameras2Use[iCam])],
+                        "confidence": confidenceSyncListFilt,
+                        "cameras2Use": c_cameras2Use,
+                    }
+                    corVal, lag = cross_corr_multiple_timeseries(
+                        mkrSpeedList[iCam],
+                        mkrSpeedList[0],
+                        multCorrGaussianStd=maxShiftSteps / 2,
+                        dataForReproj=dataForReproj,
+                        visualize=False,
                     )
-                )
-            shiftVals.append(lag)
-            timeVecs[iCam] = timeVecs[iCam] - shiftVals[iCam]
-        tStartEndVec[iCam, :] = [timeVecs[iCam][0], timeVecs[iCam][-1]]
+                elif syncActivity == "handPunch":
+                    corVal, lag = syncHandPunch(
+                        [handPunchVertPositionList[i] for i in [0, iCam]],
+                        handForPunch,
+                        maxShiftSteps=maxShiftSteps,
+                    )
+                if (
+                    np.abs(lag) > maxShiftSteps
+                ):  # if this fails and we get a lag greater than maxShiftSteps (units=timesteps)
+                    lag = 0
+                    print(
+                        "Did not use cross correlation to sync {} - computed shift was greater than specified {} frames. Shift set to 0.".format(
+                            c_cameras2Use[iCam], maxShiftSteps
+                        )
+                    )
+                shiftVals.append(lag)
+                timeVecs[iCam] = timeVecs[iCam] - shiftVals[iCam]
+            tStartEndVec[iCam, :] = [timeVecs[iCam][0], timeVecs[iCam][-1]]
 
     # align signals - will start at the latest-starting frame (most negative shift) and end at
     # nFrames - the end of the earliest starting frame (nFrames - max shift)
-    tStart = np.max(tStartEndVec[:, 0])
-    tEnd = np.min(tStartEndVec[:, 1])
 
     keypointsSync = []
     confidenceSync = []
     startEndFrames = []
     nansInOutSync = []
-    for iCam, key in enumerate(keyFiltList):
-        # Trim the keypoints and confidence lists
-        confidence = confFiltList[iCam]
-        iStart = int(np.argwhere(timeVecs[iCam] == tStart))
-        iEnd = int(np.argwhere(timeVecs[iCam] == tEnd))
-        keypointsSync.append(key[:, iStart : iEnd + 1, :])
-        confidenceSync.append(confidence[:, iStart : iEnd + 1])
-        if shiftVals[iCam] > 0:
-            shiftednNansInOut = nansInOutList[iCam] - shiftVals[iCam]
-        else:
+    if bypassSync:
+        print(keyFiltList[0].shape)
+        assert (
+            len({len(key[0, :]) for key in keyFiltList}) == 1
+        ), "All cameras must have same number of frames"
+        for iCam, key in enumerate(keyFiltList):
+            # Trim the keypoints and confidence lists
+            confidence = confFiltList[iCam]
+            iStart = 0
+            iEnd = len(key[0, :])
+            keypointsSync.append(key[:, iStart : iEnd + 1, :])
+            confidenceSync.append(confidence[:, iStart : iEnd + 1])
             shiftednNansInOut = nansInOutList[iCam]
-        nansInOutSync.append(shiftednNansInOut)
-        # Save start and end frames to list, so can rewrite videos in
-        # triangulateMultiviewVideo
-        startEndFrames.append([iStart, iEnd])
+            nansInOutSync.append(shiftednNansInOut)
+            # Save start and end frames to list, so can rewrite videos in
+            # triangulateMultiviewVideo
+            startEndFrames.append([iStart, iEnd])
+    else:
+        tStart = np.max(tStartEndVec[:, 0])
+        tEnd = np.min(tStartEndVec[:, 1])
+        for iCam, key in enumerate(keyFiltList):
+            # Trim the keypoints and confidence lists
+            confidence = confFiltList[iCam]
+            iStart = int(np.argwhere(timeVecs[iCam] == tStart))
+            iEnd = int(np.argwhere(timeVecs[iCam] == tEnd))
+            keypointsSync.append(key[:, iStart : iEnd + 1, :])
+            confidenceSync.append(confidence[:, iStart : iEnd + 1])
+            if shiftVals[iCam] > 0:
+                shiftednNansInOut = nansInOutList[iCam] - shiftVals[iCam]
+            else:
+                shiftednNansInOut = nansInOutList[iCam]
+            nansInOutSync.append(shiftednNansInOut)
+            # Save start and end frames to list, so can rewrite videos in
+            # triangulateMultiviewVideo
+            startEndFrames.append([iStart, iEnd])
 
     # Plot synchronized velocity curves
     if visualize:
@@ -3534,10 +3561,16 @@ def findOverlap(confidenceList, markers4VertVel):
 
 # %%
 def loadPklVideo(
-    pklPath, videoFullPath, imageBasedTracker=False, poseDetector="OpenPose"
+    pklPath,
+    videoFullPath,
+    imageBasedTracker=False,
+    poseDetector="OpenPose",
+    useAnatomicalMarkers=True,
 ):
-    nb_keypoints = 36
-    # nb_keypoints = 25
+    if useAnatomicalMarkers:
+        nb_keypoints = 51
+    else:
+        nb_keypoints = 25
     open_file = open(pklPath, "rb")
     frames = pickle.load(open_file)
     open_file.close()

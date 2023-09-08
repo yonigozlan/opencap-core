@@ -1269,11 +1269,10 @@ def getMMposeAnatomicalMarkerNames():
         "l_lelbow",
         "r_melbow",
         "l_melbow",
-        "r_mwrist",
-        "l_mwrist",
         "r_lwrist",
         "l_lwrist",
-        "C7",
+        "r_mwrist",
+        "l_mwrist",
         "r_ASIS",
         "l_ASIS",
         "r_PSIS",
@@ -1290,14 +1289,30 @@ def getMMposeAnatomicalMarkerNames():
         "l_5meta",
         "r_toe",
         "l_toe",
-        "r_pinky",
-        "l_pinky",
-        "r_index",
-        "l_index",
-        "L4",
-        "T6",
         "r_big_toe",
         "l_big_toe",
+        "l_calc",
+        "r_calc",
+        "r_bpinky",
+        "l_bpinky",
+        "r_tpinky",
+        "l_tpinky",
+        "r_bindex",
+        "l_bindex",
+        "r_tindex",
+        "l_tindex",
+        "r_tmiddle",
+        "l_tmiddle",
+        "r_tring",
+        "l_tring",
+        "r_bthumb",
+        "l_bthumb",
+        "r_tthumb",
+        "l_tthumb",
+        "C7",
+        "L2",
+        "T11",
+        "T6",
     ]
 
     return markerNames
@@ -1858,7 +1873,13 @@ def getVideoExtension(pathFileWithoutExtension):
     pathVideoDir = os.path.split(pathFileWithoutExtension)[0]
     videoName = os.path.split(pathFileWithoutExtension)[1]
     for file in os.listdir(pathVideoDir):
+        print(videoName, file.rsplit(".", 1)[0])
         if videoName == file.rsplit(".", 1)[0]:
+            extension = "." + file.rsplit(".", 1)[1]
+        elif (
+            "_syncdWithMocap" in file
+            and videoName == file.rsplit(".", 1)[0].rsplit("_syncdWithMocap")[0]
+        ):
             extension = "." + file.rsplit(".", 1)[1]
 
     return extension
