@@ -7,6 +7,7 @@ import time
 
 import cv2
 import numpy as np
+from constants import constants
 from decouple import config
 from utils import (getMMposeAnatomicalMarkerNames, getMMposeMarkerNames,
                    getOpenPoseMarkerNames, getVideoExtension)
@@ -297,10 +298,12 @@ def runMMposeVideo(
     trialName,
     generateVideo=True,
     bbox_thr=0.8,
-    model_config_person="demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
-    model_ckpt_person="https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
-    model_config_pose="configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_eval_rich-384x288_pretrained.py",
-    model_ckpt_pose="pretrain/hrnet/best_infinity_AP_epoch_21.pth",
+    model_config_person = constants["model_config_person"],
+    model_ckpt_person = constants["model_ckpt_person"],
+    # model_config_person="demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
+    # model_ckpt_person="https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
+    model_config_pose=constants["model_config_pose"],
+    model_ckpt_pose=constants["model_ckpt_pose"],
 ):
     trialPrefix, _ = os.path.splitext(os.path.basename(fileName))
     videoFullPath = os.path.normpath(os.path.join(cameraDirectory, fileName))
@@ -394,7 +397,7 @@ def runMMposeVideo(
             )
 
             # Run pose detection.
-            pathModelCkptPose = os.path.join(pathMMpose, model_ckpt_pose)
+            pathModelCkptPose = constants["model_ckpt_pose_absolute"]
             videoOutPath = os.path.join(
                 pathOutputVideo, trialPrefix + "withKeypoints.mp4"
             )

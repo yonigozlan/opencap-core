@@ -58,6 +58,7 @@ repoDir = os.path.abspath(
 )
 sys.path.append(repoDir)
 
+from constants import constants
 from main import main
 from utils import importMetadata
 
@@ -68,7 +69,7 @@ from utils import importMetadata
 #   C:/Users/opencap/Documents/LabValidation_withVideos/subject2
 #   C:/Users/opencap/Documents/LabValidation_withVideos/subject3
 #   ...
-dataDir = "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data"
+dataDir = constants["dataDir"]
 
 # The dataset includes 2 sessions per subject.The first session includes
 # static, sit-to-stand, squat, and drop jump trials. The second session
