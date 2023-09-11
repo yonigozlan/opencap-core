@@ -23,8 +23,9 @@ from utilsChecker import (autoSelectExtrinsicSolution, calcExtrinsicsFromVideo,
                           synchronizeVideos, triangulateMultiviewVideo,
                           writeTRCfrom3DKeypoints)
 from utilsDetector import runPoseDetector
-from utilsOpenSim import (generateVisualizerJson, getScaleTimeRange, runIKTool,
-                          runScaleTool)
+
+# from utilsOpenSim import (generateVisualizerJson, getScaleTimeRange, runIKTool,
+#                           runScaleTool)
 
 
 def main(
@@ -64,7 +65,7 @@ def main(
     # Marker augmentation.
     runMarkerAugmentation = False
     # OpenSim pipeline.
-    runOpenSimPipeline = True
+    runOpenSimPipeline = False
     # Lowpass filter frequency of 2D keypoints for gait and everything else.
     filtFreqs = {"gait": 12, "default": 500}  # defaults to framerate/2
     # High-resolution for OpenPose.
