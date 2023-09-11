@@ -65,7 +65,7 @@ def main(
     # Marker augmentation.
     runMarkerAugmentation = False
     # OpenSim pipeline.
-    runOpenSimPipeline = False
+    runOpenSimPipeline = True
     # Lowpass filter frequency of 2D keypoints for gait and everything else.
     filtFreqs = {"gait": 12, "default": 500}  # defaults to framerate/2
     # High-resolution for OpenPose.
