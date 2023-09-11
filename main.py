@@ -324,7 +324,7 @@ def main(
                 undistortPoints=True,
                 CamParamDict=CamParamDict,
                 filtFreqs=filtFreqs,
-                confidenceThreshold=0.4,
+                confidenceThreshold=0.8,
                 imageBasedTracker=False,
                 cams2Use=camerasToUse,
                 poseDetector=poseDetector,

@@ -13,7 +13,7 @@ if config_global == "local":
         "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_coco_eval_bedlam-384x288_pretrained.py",
         "model_ckpt_pose" : "pretrain/hrnet/best_infinity_AP_epoch_21.pth",
         "dataDir" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data",
-        "batch_size_det": 6,
+        "batch_size_det": 4,
         "batch_size_pose": 8
     }
     constants["model_ckpt_pose_absolute"] = os.path.join(constants["mmposeDirectory"], constants["model_ckpt_pose"])

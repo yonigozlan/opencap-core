@@ -301,6 +301,7 @@ for subjectName in subjects:
                                 time_end = min(time_end, time_end_mocap_temp)
 
                             # Find corresponding indices in mocap data
+                            min_len = min(trial_mocap_np.shape[0], trial_video_np.shape[0])
                             idx_start_mocap = np.argwhere(trial_mocap_np[:, 0] == time_start)[0][0]
                             idx_end_mocap = np.argwhere(trial_mocap_np[:, 0] == time_end)[0][0]
                             # Select mocap data based on video-based time vector

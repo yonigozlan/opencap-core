@@ -1263,7 +1263,7 @@ def synchronizeVideoKeypoints(
     allMarkerList = []
     for keyRaw, conf in zip(keypointList, confidenceList):
         keyRaw_clean, _, _, _ = clean2Dkeypoints(
-            keyRaw, conf, confidenceThreshold=0.3, nCams=nCams, linearInterp=True
+            keyRaw, conf, confidenceThreshold=confidenceThreshold, nCams=nCams, linearInterp=True
         )
         keyRaw_clean_smooth = smoothKeypoints(keyRaw_clean, sdKernel=3)
         handPunchVertPositionList.append(
