@@ -1,6 +1,6 @@
 import os
 
-config_global = "local"
+config_global = "sherlock" # "local" or "sherlock
 
 constants = {}
 if config_global == "local":
