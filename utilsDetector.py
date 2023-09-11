@@ -393,7 +393,7 @@ def runMMposeVideo(
             bboxPath = os.path.join(pathOutputBox, trialPrefix + ".pkl")
             full_model_config_person = os.path.join(pathMMpose, model_config_person)
             detection_inference(
-                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath
+                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=constants["batch_size_det"]
             )
 
             # Run pose detection.
@@ -409,6 +409,7 @@ def runMMposeVideo(
                 bboxPath,
                 pklPath,
                 videoOutPath,
+                batch_size=constants["batch_size_pose"],
                 bbox_thr=bbox_thr,
                 visualize=generateVideo,
             )

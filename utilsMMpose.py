@@ -2,12 +2,8 @@ import pickle
 
 import cv2
 import torch
-from mmpose_utils import (
-    concat,
-    convert_instance_to_frame,
-    frame_iter,
-    process_mmdet_results,
-)
+from mmpose_utils import (concat, convert_instance_to_frame, frame_iter,
+                          process_mmdet_results)
 from tqdm import tqdm
 
 from mmpose.apis import init_model as init_pose_estimator
@@ -22,12 +18,8 @@ except (ImportError, ModuleNotFoundError):
     has_mmdet = False
 from mmengine.dataset import Compose, default_collate, pseudo_collate
 from mmpose_data import CustomVideoDataset
-from mmpose_inference import (
-    init_pose_model,
-    init_test_pipeline,
-    run_pose_inference,
-    run_pose_tracking,
-)
+from mmpose_inference import (init_pose_model, init_test_pipeline,
+                              run_pose_inference, run_pose_tracking)
 from torch.utils.data import DataLoader
 
 # from mmpose.apis import vis_pose_tracking_result
@@ -49,7 +41,7 @@ def get_dataset_info():
 
 # %%
 def detection_inference(
-    model_config, model_ckpt, video_path, bbox_path, device="cuda:0", det_cat_id=1
+    model_config, model_ckpt, video_path, bbox_path, batch_size=32, device="cuda:0", det_cat_id=1
 ):
     """Visualize the demo images.
 
@@ -63,13 +55,26 @@ def detection_inference(
 
     output = []
     nFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    batched_frames = []
     for img in tqdm(frame_iter(cap), total=nFrames):
-        # test a single image, the resulting box is (x1, y1, x2, y2)
-        mmdet_results = inference_detector(det_model, img)
+        # test a batch of images
+        batched_frames.append(img)
+        if len(batched_frames) == batch_size:
+            # the resulting box is (x1, y1, x2, y2)
+            mmdet_results_batched = inference_detector(det_model, batched_frames)
+            batched_frames = []
+            for mmdet_results in mmdet_results_batched:
+                # keep the person class bounding boxes.
+                person_results = process_mmdet_results(mmdet_results, det_cat_id)
+                output.append(person_results)
 
-        # keep the person class bounding boxes.
-        person_results = process_mmdet_results(mmdet_results, det_cat_id)
-        output.append(person_results)
+    if len(batched_frames) > 0:
+        mmdet_results_batched = inference_detector(det_model, batched_frames)
+        batched_frames = []
+        for mmdet_results in mmdet_results_batched:
+                # keep the person class bounding boxes.
+                person_results = process_mmdet_results(mmdet_results, det_cat_id)
+                output.append(person_results)
 
     output_file = bbox_path
     pickle.dump(output, open(str(output_file), "wb"))
