@@ -20,7 +20,7 @@ scriptDir = os.getcwd()
 repoDir = os.path.dirname(scriptDir)
 mainDir = getDataDirectory(False)
 dataDir = constants["dataDir"]
-dataName = 'Data'
+dataName = 'Data_upsampled'
 outputDir = os.path.join(dataDir, 'Results-paper-augmenterV2')
 
 # %% User inputs.
