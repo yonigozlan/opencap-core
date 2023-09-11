@@ -23,9 +23,8 @@ from utilsChecker import (autoSelectExtrinsicSolution, calcExtrinsicsFromVideo,
                           synchronizeVideos, triangulateMultiviewVideo,
                           writeTRCfrom3DKeypoints)
 from utilsDetector import runPoseDetector
-
-# from utilsOpenSim import (generateVisualizerJson, getScaleTimeRange, runIKTool,
-#                           runScaleTool)
+from utilsOpenSim import (generateVisualizerJson, getScaleTimeRange, runIKTool,
+                          runScaleTool)
 
 
 def main(
