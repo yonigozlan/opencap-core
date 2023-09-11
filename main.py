@@ -16,7 +16,7 @@ import scipy
 import yaml
 from utils import (getDataDirectory, getMMposeDirectory, getOpenPoseDirectory,
                    getVideoExtension, importMetadata, loadCameraParameters)
-from utilsAugmenter import augmentTRC
+# from utilsAugmenter import augmentTRC
 from utilsChecker import (autoSelectExtrinsicSolution, calcExtrinsicsFromVideo,
                           isCheckerboardUpsideDown, popNeutralPoseImages,
                           rotateIntrinsics, saveCameraParameters,
