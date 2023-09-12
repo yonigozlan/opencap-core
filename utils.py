@@ -1318,6 +1318,58 @@ def getMMposeAnatomicalMarkerNames():
 
     return markerNames
 
+def getMMposeAnatomicalMarkerPairs():
+    markerNames = {
+        "rshoulder":"lshoulder",
+        "lshoulder":"rshoulder",
+        "r_lelbow":"l_lelbow",
+        "l_lelbow":"r_lelbow",
+        "r_melbow":"l_melbow",
+        "l_melbow":"r_melbow",
+        "r_lwrist":"l_lwrist",
+        "l_lwrist":"r_lwrist",
+        "r_mwrist":"l_mwrist",
+        "l_mwrist":"r_mwrist",
+        "r_ASIS":"l_ASIS",
+        "l_ASIS":"r_ASIS",
+        "r_PSIS":"l_PSIS",
+        "l_PSIS":"r_PSIS",
+        "r_knee":"l_knee",
+        "l_knee":"r_knee",
+        "r_mknee":"l_mknee",
+        "l_mknee":"r_mknee",
+        "r_ankle":"l_ankle",
+        "l_ankle":"r_ankle",
+        "r_mankle":"l_mankle",
+        "l_mankle":"r_mankle",
+        "r_5meta":"l_5meta",
+        "l_5meta":"r_5meta",
+        "r_toe":"l_toe",
+        "l_toe":"r_toe",
+        "r_big_toe":"l_big_toe",
+        "l_big_toe":"r_big_toe",
+        "l_calc":"r_calc",
+        "r_calc":"l_calc",
+        "r_bpinky":"l_bpinky",
+        "l_bpinky":"r_bpinky",
+        "r_tpinky":"l_tpinky",
+        "l_tpinky":"r_tpinky",
+        "r_bindex":"l_bindex",
+        "l_bindex":"r_bindex",
+        "r_tindex":"l_tindex",
+        "l_tindex":"r_tindex",
+        "r_tmiddle":"l_tmiddle",
+        "l_tmiddle":"r_tmiddle",
+        "r_tring":"l_tring",
+        "l_tring":"r_tring",
+        "r_bthumb":"l_bthumb",
+        "l_bthumb":"r_bthumb",
+        "r_tthumb":"l_tthumb",
+        "l_tthumb":"r_tthumb",
+    }
+
+    return markerNames
+
 
 def rewriteVideos(
     inputPath,
