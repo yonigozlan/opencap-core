@@ -395,41 +395,41 @@ if saveAndOverwriteResults:
     np.save(os.path.join(outputDir, 'MEs.npy'), MEs)
 print(RMSEs['all'][poseDetector][cameraSetup][augmenterType][processingType])
 
-# all_motions = ['all'] + motions
-# bps, means_RMSEs, medians_RMSEs, stds_RMSEs = {}, {}, {}, {}
-# for motion in all_motions:
-#     bps[motion], means_RMSEs[motion], medians_RMSEs[motion], stds_RMSEs[motion] = {}, {}, {}, {}
-#     if plots:
-#         fig, axs = plt.subplots(5, 3, sharex=True)
-#         fig.suptitle(motion)
-#     for count, coordinate in enumerate(coordinates_lr):
-#         c_data = {}
-#         for processingType in processingTypes:
-#             for augmenterType in augmenterTypes:
-#                 for poseDetector in poseDetectors:
-#                     for cameraSetup in cameraSetups:
-#                         if coordinate[-2:] == '_l':
-#                             c_data[poseDetector + '_' + cameraSetup + '_' + augmenterType + '_' + processingType] = (
-#                                 RMSEs[motion][poseDetector][cameraSetup][augmenterType][processingType][coordinate].tolist() +
-#                                 RMSEs[motion][poseDetector][cameraSetup][augmenterType][processingType][coordinate[:-2] + '_r'].tolist())
-#                             coordinate_title = coordinate[:-2]
-#                         else:
-#                             c_data[poseDetector + '_' + cameraSetup + '_' + augmenterType+ '_' + processingType] = (
-#                                 RMSEs[motion][poseDetector][cameraSetup][augmenterType][processingType][coordinate].tolist())
-#                             coordinate_title = coordinate
-#         if plots:
-#             ax = axs.flat[count]
-#             bps[motion][coordinate] = ax.boxplot(c_data.values())
-#             ax.set_title(coordinate_title)
-#             xticks = list(range(1, len(cameraSetups)*len(poseDetectors)*len(augmenterTypes)*len(processingTypes)+1))
-#             ax.set_xticks(xticks)
-#             ax.set_xticklabels(c_data.keys(), rotation = 90)
-#             ax.set_ylim(0, 20)
-#             ax.axhline(y=5, color='r', linestyle='--')
-#             ax.axhline(y=10, color='b', linestyle='--')
+all_motions = ['all'] + motions
+bps, means_RMSEs, medians_RMSEs, stds_RMSEs = {}, {}, {}, {}
+for motion in all_motions:
+    bps[motion], means_RMSEs[motion], medians_RMSEs[motion], stds_RMSEs[motion] = {}, {}, {}, {}
+    if plots:
+        fig, axs = plt.subplots(5, 3, sharex=True)
+        fig.suptitle(motion)
+    for count, coordinate in enumerate(coordinates_lr):
+        c_data = {}
+        for processingType in processingTypes:
+            for augmenterType in augmenterTypes:
+                for poseDetector in poseDetectors:
+                    for cameraSetup in cameraSetups:
+                        if coordinate[-2:] == '_l':
+                            c_data[poseDetector + '_' + cameraSetup + '_' + augmenterType + '_' + processingType] = (
+                                RMSEs[motion][poseDetector][cameraSetup][augmenterType][processingType][coordinate].tolist() +
+                                RMSEs[motion][poseDetector][cameraSetup][augmenterType][processingType][coordinate[:-2] + '_r'].tolist())
+                            coordinate_title = coordinate[:-2]
+                        else:
+                            c_data[poseDetector + '_' + cameraSetup + '_' + augmenterType+ '_' + processingType] = (
+                                RMSEs[motion][poseDetector][cameraSetup][augmenterType][processingType][coordinate].tolist())
+                            coordinate_title = coordinate
+        if plots:
+            ax = axs.flat[count]
+            bps[motion][coordinate] = ax.boxplot(c_data.values())
+            ax.set_title(coordinate_title)
+            xticks = list(range(1, len(cameraSetups)*len(poseDetectors)*len(augmenterTypes)*len(processingTypes)+1))
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(c_data.keys(), rotation = 90)
+            ax.set_ylim(0, 20)
+            ax.axhline(y=5, color='r', linestyle='--')
+            ax.axhline(y=10, color='b', linestyle='--')
 
-#         means_RMSEs[motion][coordinate] = [np.mean(c_data[a]) for a in c_data]
-#         medians_RMSEs[motion][coordinate] = [np.median(c_data[a]) for a in c_data]
-#         stds_RMSEs[motion][coordinate] = [np.std(c_data[a]) for a in c_data]
+        means_RMSEs[motion][coordinate] = [np.mean(c_data[a]) for a in c_data]
+        medians_RMSEs[motion][coordinate] = [np.median(c_data[a]) for a in c_data]
+        stds_RMSEs[motion][coordinate] = [np.std(c_data[a]) for a in c_data]
 
-# print(means_RMSEs)
+print(means_RMSEs)
