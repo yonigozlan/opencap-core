@@ -962,7 +962,7 @@ def orderCamerasForAutoCalDetection(extrinsicsOptions):
     return sortedCams
 
 
-def preprocess2Dkeypoints(key2D, confidence, baseThreshold=5):
+def preprocess2Dkeypoints(key2D, confidence, baseThreshold=10):
     # key2D : np.array of shape (nMarkers, nFrames, 2)
     # get median change for eack marker in between two frames :
     # if change is too big, investigate
@@ -979,9 +979,10 @@ def preprocess2Dkeypoints(key2D, confidence, baseThreshold=5):
     # get marker names
     markerNames = getMMposeAnatomicalMarkerNames()
     markerPairs = getMMposeAnatomicalMarkerPairs()
-    already_processed = []
-    for iMarker in range(key2D.shape[0]):
-        for iFrame in range(1, key2D.shape[1]):
+    for iFrame in range(1, key2D.shape[1]):
+        print("frame", iFrame)
+        already_processed = []
+        for iMarker in range(key2D.shape[0]):
             markerName = markerNames[iMarker]
             if markerName not in already_processed:
                 dist = np.linalg.norm(key2D[iMarker, iFrame, :] - key2D[iMarker, iFrame-1, :])
@@ -993,27 +994,32 @@ def preprocess2Dkeypoints(key2D, confidence, baseThreshold=5):
                         distPair = np.linalg.norm(key2D[iMarkerPair, iFrame, :] - key2D[iMarkerPair, iFrame-1, :])
                         distPairToMarker = np.linalg.norm(key2D[iMarkerPair, iFrame, :] - key2D[iMarker, iFrame-1, :])
                         distMarkerToPair = np.linalg.norm(key2D[iMarker, iFrame, :] - key2D[iMarkerPair, iFrame-1, :])
-                        if distPair > thresholds[iMarkerPair] :
+                        if distMarkerToPair < distPair and distPairToMarker < dist:
+                            # swap
+                            print("swap detected")
+                            key2D[iMarker, iFrame, :], key2D[iMarkerPair, iFrame, :] = key2D[iMarkerPair, iFrame, :], key2D[iMarker, iFrame, :]
+                            confidence[iMarker, iFrame], confidence[iMarkerPair, iFrame] = confidence[iMarkerPair, iFrame], confidence[iMarker, iFrame]
+                            already_processed.append(markerNamePair)
+                            already_processed.append(markerName)
+                        elif distPair > thresholds[iMarkerPair] :
+                            # set confidence to 0
                             print("THRESHOLD EXCEEDED FOR PAIR", markerNamePair)
-                            if distMarkerToPair < thresholds[iMarkerPair] and distPairToMarker < thresholds[iMarker]:
-                                # swap
-                                print("swap detected")
-                                key2D[iMarker, iFrame, :], key2D[iMarkerPair, iFrame, :] = key2D[iMarkerPair, iFrame, :], key2D[iMarker, iFrame, :]
-                                confidence[iMarker, iFrame], confidence[iMarkerPair, iFrame] = confidence[iMarkerPair, iFrame], confidence[iMarker, iFrame]
-                            else:
-                                # set confidence to 0
-                                print("set confidence to 0 for both")
-                                confidence[iMarker, iFrame] = 0
-                                confidence[iMarkerPair, iFrame] = 0
+                            print("set confidence to 0 for both")
+                            # key2D[iMarker, iFrame, :] = key2D[iMarker, iFrame-1, :]
+                            # key2D[iMarkerPair, iFrame, :] = key2D[iMarkerPair, iFrame-1, :]
+                            confidence[iMarker, iFrame] = 0
+                            confidence[iMarkerPair, iFrame] = 0
 
                             already_processed.append(markerNamePair)
                             already_processed.append(markerName)
                         else:
                             print("set confidence to 0")
+                            # key2D[iMarker, iFrame, :] = key2D[iMarker, iFrame-1, :]
                             confidence[iMarker, iFrame] = 0
                             already_processed.append(markerName)
                     else:
                         print("set confidence to 0 (single)")
+                        # key2D[iMarker, iFrame, :] = key2D[iMarker, iFrame-1, :]
                         confidence[iMarker, iFrame] = 0
                         already_processed.append(markerName)
 
@@ -1083,7 +1089,7 @@ def synchronizeVideos(
         if key2D.shape[1] == 0 and confidence.shape[1] == 0:
             camsToExclude.append(camName)
         else:
-            key2D, confidence = preprocess2Dkeypoints(key2D, confidence)
+            # key2D, confidence = preprocess2Dkeypoints(key2D, confidence)
             pointList.append(key2D)
             confList.append(confidence)
 

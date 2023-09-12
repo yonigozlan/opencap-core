@@ -6,6 +6,8 @@ import torch.nn as nn
 from mmpose_utils import (concat, convert_instance_to_frame, frame_iter,
                           process_mmdet_results)
 from tqdm import tqdm
+from utils import (getMMposeAnatomicalMarkerNames,
+                   getMMposeAnatomicalMarkerPairs)
 
 from mmpose.apis import init_model as init_pose_estimator
 from mmpose.registry import VISUALIZERS
@@ -253,7 +255,8 @@ def pose_inference_updated(
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         video_save_file = video_out_path
         videoWriter = cv2.VideoWriter(str(video_save_file), fourcc, fps, size)
-
+        markerPairs = getMMposeAnatomicalMarkerPairs()
+        markerNames = getMMposeAnatomicalMarkerNames()
         for pose_results, img in tqdm(zip(results, frame_iter(cap))):
             # display keypoints and bbox on frame
             preds = pose_results[0]["pred_instances"]
@@ -269,21 +272,24 @@ def pose_inference_updated(
                 )
                 for index_kpt in range(len(kpts)):
                     if index_kpt < 17:
-                        cv2.circle(
-                            img,
-                            (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
-                            3,
-                            (0, 0, 255),
-                            -1,
-                        )
+                        color = (0, 0, 255)
+
                     else:
-                        cv2.circle(
-                            img,
-                            (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
-                            3,
-                            (255, 0, 0),
-                            -1,
-                        )
+                        if markerNames[index_kpt-17] in markerPairs.keys():
+                            if markerNames[index_kpt-17][0] == "l":
+                                color = (255, 255, 0)
+                            else:
+                                color = (255, 0, 255)
+                        else:
+                            color = (255, 0, 0)
+
+                    cv2.circle(
+                        img,
+                        (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
+                        3,
+                        color,
+                        -1,
+                    )
             # visualizer.add_datasample(
             #     "result",
             #     img,

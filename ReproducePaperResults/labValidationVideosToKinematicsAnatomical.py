@@ -76,26 +76,26 @@ dataDir = constants["dataDir"]
 # includes walking trials. The sessions are named <subject_name>_Session0 and
 # <subject_name>_Session1.
 sessionNames = [
-    # "subject2_Session0",
-    # "subject2_Session1",
-    # "subject3_Session0",
-    # "subject3_Session1",
+    "subject2_Session0",
+    "subject2_Session1",
+    "subject3_Session0",
+    "subject3_Session1",
     "subject4_Session0",
     "subject4_Session1",
-    # "subject5_Session0",
-    # "subject5_Session1",
-    # "subject6_Session0",
-    # "subject6_Session1",
-    # "subject7_Session0",
-    # "subject7_Session1",
-    # "subject8_Session0",
-    # "subject8_Session1",
-    # "subject9_Session0",
-    # "subject9_Session1",
-    # "subject10_Session0",
-    # "subject10_Session1",
-    # "subject11_Session0",
-    # "subject11_Session1",
+    "subject5_Session0",
+    "subject5_Session1",
+    "subject6_Session0",
+    "subject6_Session1",
+    "subject7_Session0",
+    "subject7_Session1",
+    "subject8_Session0",
+    "subject8_Session1",
+    "subject9_Session0",
+    "subject9_Session1",
+    "subject10_Session0",
+    "subject10_Session1",
+    "subject11_Session0",
+    "subject11_Session1",
 ]
 
 # We only support OpenPose on Windows.
@@ -121,8 +121,8 @@ augmenter_model = "v0.2"
 # once as long as the variable overwriteRestructuring is False. To overwrite
 # flip the flag to True.
 overwriteRestructuring = False
-# subjects = ["subject" + str(i) for i in range(2, 12)]
-subjects = ["subject4"]
+subjects = ["subject" + str(i) for i in range(2, 12)]
+# subjects = ["subject4"]
 for subject in subjects:
     pathSubject = os.path.join(dataDir, subject)
     pathVideos = os.path.join(pathSubject, "VideoData")
