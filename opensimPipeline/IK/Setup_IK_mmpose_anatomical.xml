@@ -64,13 +64,13 @@
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
 					<apply>true</apply>
 					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-					<weight>20</weight>
+					<weight>10</weight>
 				</IKMarkerTask>
 				<IKMarkerTask name="r_mknee">
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
 					<apply>true</apply>
 					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-					<weight>0</weight>
+					<weight>10</weight>
 				</IKMarkerTask>
 				<IKMarkerTask name="r_ankle">
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
@@ -106,13 +106,13 @@
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
 					<apply>true</apply>
 					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-					<weight>20</weight>
+					<weight>10</weight>
 				</IKMarkerTask>
 				<IKMarkerTask name="l_mknee">
 					<!--Whether or not this task will be used during inverse kinematics solve.-->
 					<apply>true</apply>
 					<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-					<weight>0</weight>
+					<weight>10</weight>
 				</IKMarkerTask>
 				<IKMarkerTask name="l_ankle">
 					<!--Whether or not this task will be used during inverse kinematics solve.-->

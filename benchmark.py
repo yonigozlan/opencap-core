@@ -24,8 +24,8 @@ dataName = 'Data'
 outputDir = os.path.join(dataDir, 'Results-paper-augmenterV2')
 
 # %% User inputs.
-# subjects = ['subject4']
-subjects = ["subject" + str(i) for i in range(2, 12)]
+subjects = ['subject4']
+# subjects = ["subject" + str(i) for i in range(2, 12)]
 sessions = ['Session0', 'Session1']
 poseDetectors = ['mmpose_0.8']
 cameraSetups = ['2-cameras']
@@ -78,6 +78,7 @@ if not os.path.exists(os.path.join(outputDir, 'RMSEs.npy')):
     os.makedirs(outputDir)
 else:
     RMSEs = np.load(os.path.join(outputDir, 'RMSEs.npy'), allow_pickle=True).item()
+    RMSEs = {}
 if not os.path.exists(os.path.join(outputDir, 'MAEs.npy')):
     MAEs = {}
 else:
@@ -433,3 +434,83 @@ for motion in all_motions:
         stds_RMSEs[motion][coordinate] = [np.std(c_data[a]) for a in c_data]
 
 print(means_RMSEs)
+
+setups = []
+for processingType in processingTypes:
+    for augmenterType in augmenterTypes:
+        for poseDetector in poseDetectors:
+            for cameraSetup in cameraSetups:
+                setups.append(poseDetector + '_' + cameraSetup + '_' + augmenterType + '_' + processingType)
+
+suffixRMSE = ''
+if fixed_markers:
+    suffixRMSE = '_fixed'
+
+with open(os.path.join(outputDir,'RMSEs{}_means.csv'.format(suffixRMSE)), 'w', newline='') as csvfile:
+    csvWriter = csv.writer(csvfile)
+    topRow = ['motion-type', '', 'setup']
+    for label in coordinates_lr:
+
+        if label[-2:] == '_l':
+            label_adj = label[:-2]
+        else:
+            label_adj = label
+
+        topRow.extend([label_adj,''])
+    _ = csvWriter.writerow(topRow)
+    secondRow = ['', '', '']
+    secondRow.extend(["mean-RMSE",''] * len(coordinates_lr))
+    secondRow.extend(["min-rot","max-rot","mean-rot","std-rot","","min-tr","max-tr","mean-tr","std-tr"])
+    _ = csvWriter.writerow(secondRow)
+    means_RMSE_summary, mins_RMSE_summary, maxs_RMSE_summary = {}, {}, {}
+    for idxMotion, motion in enumerate(all_motions):
+        means_RMSE_summary[motion], mins_RMSE_summary[motion], maxs_RMSE_summary[motion] = {}, {}, {}
+        c_bp = means_RMSEs[motion]
+        for idxSetup, setup in enumerate(setups):
+            means_RMSE_summary[motion][setup] = {}
+            mins_RMSE_summary[motion][setup] = {}
+            maxs_RMSE_summary[motion][setup] = {}
+            if idxSetup == 0:
+                RMSErow = [motion, '', setup]
+            else:
+                RMSErow = ['', '', setup]
+            temp_med_rot = np.zeros(len(coordinates_lr_rot) + len(coordinates_bil),)
+            temp_med_tr = np.zeros(len(coordinates_lr_tr),)
+            c_rot = 0
+            c_tr = 0
+            for coordinate in coordinates_lr:
+                c_coord = c_bp[coordinate]
+                RMSErow.extend(['%.2f' %c_coord[idxSetup], ''])
+                if coordinate in coordinates_lr_rot:
+                    # We want to include twice the bilateral coordinates and
+                    # once the unilateral coordinates such as to make sure the
+                    # unilateral coordinates are not overweighted when
+                    # computing means.
+                    if coordinate[:-2] in coordinates_bil:
+                        temp_med_rot[c_rot,] = c_coord[idxSetup]
+                        temp_med_rot[c_rot+1,] = c_coord[idxSetup]
+                        c_rot += 2
+                    else:
+                        temp_med_rot[c_rot,] = c_coord[idxSetup]
+                        c_rot += 1
+                elif coordinate in coordinates_lr_tr:
+                    temp_med_tr[c_tr,] = c_coord[idxSetup]
+                    c_tr += 1
+            # Add min, max, mean
+            RMSErow.extend(['%.2f' %np.round(np.min(temp_med_rot),1)])
+            RMSErow.extend(['%.2f' %np.round(np.max(temp_med_rot),1)])
+            RMSErow.extend(['%.2f' %np.round(np.mean(temp_med_rot),1)])
+            RMSErow.extend(['%.2f' %np.round(np.std(temp_med_rot),1), ''])
+            RMSErow.extend(['%.2f' %np.round(np.min(temp_med_tr*1000),1)])
+            RMSErow.extend(['%.2f' %np.round(np.max(temp_med_tr*1000),1)])
+            RMSErow.extend(['%.2f' %np.round(np.mean(temp_med_tr*1000),1)])
+            RMSErow.extend(['%.2f' %np.round(np.std(temp_med_tr*1000),1)])
+            _ = csvWriter.writerow(RMSErow)
+            means_RMSE_summary[motion][setup]['rotation'] = np.round(np.mean(temp_med_rot),1)
+            means_RMSE_summary[motion][setup]['translation'] = np.round(np.mean(temp_med_tr*1000),1)
+
+            mins_RMSE_summary[motion][setup]['rotation'] = np.round(np.min(temp_med_rot),1)
+            mins_RMSE_summary[motion][setup]['translation'] = np.round(np.min(temp_med_tr*1000),1)
+
+            maxs_RMSE_summary[motion][setup]['rotation'] = np.round(np.max(temp_med_rot),1)
+            maxs_RMSE_summary[motion][setup]['translation'] = np.round(np.max(temp_med_tr*1000),1)
