@@ -30,8 +30,8 @@ if config_global == "sherlock":
         # "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_coco_eval_bedlam-384x288_pretrained.py",
         # "model_ckpt_pose" : "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_eval_bedlam/HRNet/w48_dark_pretrained/best_infinity_AP_epoch_18.pth",
         "dataDir" : "/scratch/users/yonigoz/OpenCap_data",
-        "batch_size_det": 128,
-        "batch_size_pose": 16
+        "batch_size_det": 2,
+        "batch_size_pose": 1
     }
     constants["model_ckpt_pose_absolute"] = constants["model_ckpt_pose"]
 

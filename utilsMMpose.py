@@ -164,6 +164,7 @@ def inference_detector_batched(
     with torch.no_grad():
         result_list = model.test_step(data_batched)
 
+    torch.cuda.empty_cache()
 
     if not is_batch:
         return result_list[0]
