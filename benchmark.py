@@ -21,12 +21,12 @@ scriptDir = os.getcwd()
 repoDir = os.path.dirname(scriptDir)
 mainDir = getDataDirectory(False)
 dataDir = constants["dataDir"]
-dataName = 'Data'
+dataName = 'Data_2knees'
 outputDir = os.path.join(dataDir, 'Results-paper-augmenterV2')
 
 # %% User inputs.
-subjects = ['subject4']
-# subjects = ["subject" + str(i) for i in range(2, 12)]
+# subjects = ['subject4']
+subjects = ["subject" + str(i) for i in range(2, 12)]
 sessions = ['Session0', 'Session1']
 poseDetectors = ['mmpose_0.8']
 cameraSetups = ['2-cameras']
@@ -395,7 +395,7 @@ if saveAndOverwriteResults:
     np.save(os.path.join(outputDir, 'RMSEs.npy'), RMSEs)
     np.save(os.path.join(outputDir, 'MAEs.npy'), MAEs)
     np.save(os.path.join(outputDir, 'MEs.npy'), MEs)
-print(RMSEs['all'][poseDetector][cameraSetup][augmenterType][processingType])
+# print(RMSEs['all'][poseDetector][cameraSetup][augmenterType][processingType])
 
 all_motions = ['all'] + motions
 bps, means_RMSEs, medians_RMSEs, stds_RMSEs = {}, {}, {}, {}
@@ -433,8 +433,6 @@ for motion in all_motions:
         means_RMSEs[motion][coordinate] = [np.mean(c_data[a]) for a in c_data]
         medians_RMSEs[motion][coordinate] = [np.median(c_data[a]) for a in c_data]
         stds_RMSEs[motion][coordinate] = [np.std(c_data[a]) for a in c_data]
-
-print(means_RMSEs)
 
 setups = []
 for processingType in processingTypes:
@@ -518,7 +516,10 @@ with open(os.path.join(outputDir,'RMSEs{}_means.csv'.format(suffixRMSE)), 'w', n
 
 
 # Add wandb logging
+mean_RMSEs_df = pd.DataFrame(means_RMSEs).transpose().applymap(lambda x: x[0]).reset_index()
+print(mean_RMSEs_df)
 wandb.init(project="opencap_bench",
             entity="yonigoz",
-            name="merge_bedlam_infinity_eval_rich/HRNet/w48_dark_pretrained",)
-wandb.log(means_RMSE_summary)
+            name="subject4_local",)
+mean_RMSEs_table = wandb.Table(dataframe=mean_RMSEs_df)
+wandb.log({"Mean RMSEs": mean_RMSEs_table})
