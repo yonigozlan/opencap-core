@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats
 import utilsDataman as dm
+import wandb
 from constants import constants
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from utils import getDataDirectory, storage2df
@@ -514,3 +515,10 @@ with open(os.path.join(outputDir,'RMSEs{}_means.csv'.format(suffixRMSE)), 'w', n
 
             maxs_RMSE_summary[motion][setup]['rotation'] = np.round(np.max(temp_med_rot),1)
             maxs_RMSE_summary[motion][setup]['translation'] = np.round(np.max(temp_med_tr*1000),1)
+
+
+# Add wandb logging
+wandb.init(project="opencap_bench",
+            entity="yonigoz",
+            name="merge_bedlam_infinity_eval_rich/HRNet/w48_dark_pretrained",)
+wandb.log(means_RMSE_summary)
