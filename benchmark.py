@@ -25,8 +25,8 @@ dataName = 'Data'
 outputDir = os.path.join(dataDir, 'Results-paper-augmenterV2')
 
 # %% User inputs.
-subjects = ['subject4']
-# subjects = ["subject" + str(i) for i in range(2, 12)]
+# subjects = ['subject4']
+subjects = ["subject" + str(i) for i in range(2, 12)]
 sessions = ['Session0', 'Session1']
 poseDetectors = ['mmpose_0.8']
 cameraSetups = ['2-cameras']
