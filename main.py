@@ -376,8 +376,10 @@ def main(
 
         if useAnatomicalMarkers:
             if keypoints3D.shape[2] < 10:
-                keypoints3D = np.zeros((3, 51, 10))
-                confidence3D = np.zeros((1, 51, 10))
+                keypoints3D = np.zeros((3, 42, 10))
+                confidence3D = np.zeros((1, 42, 10))
+                # keypoints3D = np.zeros((3, 53, 10))
+                # confidence3D = np.zeros((1, 53, 10))
         else:
             # Return 0s if not enough data.
             if keypoints3D.shape[2] < 10:

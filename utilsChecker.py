@@ -22,7 +22,9 @@ from scipy.interpolate import pchip_interpolate
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import butter, find_peaks, gaussian, sosfiltfilt
 from scipy.spatial.transform import Rotation
-from utils import (delete_multiple_element, getMMposeAnatomicalMarkerNames,
+from utils import (delete_multiple_element, getMMposeAnatomicalCocoMarkerNames,
+                   getMMposeAnatomicalCocoMarkerPairs,
+                   getMMposeAnatomicalMarkerNames,
                    getMMposeAnatomicalMarkerPairs, getOpenPoseFaceMarkers,
                    getOpenPoseMarkerNames, loadCameraParameters, numpy2TRC,
                    rewriteVideos)
@@ -977,8 +979,10 @@ def preprocess2Dkeypoints(key2D, confidence, baseThreshold=10):
     thresholds = medianDist + 4 * np.sqrt(varDist) + baseThreshold
     print("thresholds", thresholds)
     # get marker names
-    markerNames = getMMposeAnatomicalMarkerNames()
-    markerPairs = getMMposeAnatomicalMarkerPairs()
+    # markerNames = getMMposeAnatomicalMarkerNames()
+    # markerPairs = getMMposeAnatomicalMarkerPairs()
+    markerNames = getMMposeAnatomicalCocoMarkerNames()
+    markerPairs = getMMposeAnatomicalCocoMarkerPairs()
     for iFrame in range(1, key2D.shape[1]):
         print("frame", iFrame)
         already_processed = []
@@ -1042,7 +1046,7 @@ def synchronizeVideos(
     use_anatomical_markers=True,
 ):
     if use_anatomical_markers:
-        markerNames = getMMposeAnatomicalMarkerNames()
+        markerNames = getMMposeAnatomicalCocoMarkerNames()
     else:
         markerNames = getOpenPoseMarkerNames()
 
@@ -1203,7 +1207,8 @@ def synchronizeVideoKeypoints(
         c_CameraDirectories.pop(idxBadCamera)
 
     if useAnatomicalMarkers:
-        markerNames = getMMposeAnatomicalMarkerNames()
+        # markerNames = getMMposeAnatomicalMarkerNames()
+        markerNames = getMMposeAnatomicalCocoMarkerNames()
     else:
         markerNames = getOpenPoseMarkerNames()
     mkrDict = {mkr: iMkr for iMkr, mkr in enumerate(markerNames)}
@@ -1215,7 +1220,7 @@ def synchronizeVideoKeypoints(
                 mkrDict["r_ankle"],
                 mkrDict["r_mankle"],
                 mkrDict["r_5meta"],
-                mkrDict["r_toe"],
+                # mkrDict["r_toe"],
                 mkrDict["r_big_toe"],
                 mkrDict["r_calc"],
             ],
@@ -1223,27 +1228,29 @@ def synchronizeVideoKeypoints(
                 mkrDict["l_ankle"],
                 mkrDict["l_mankle"],
                 mkrDict["l_5meta"],
-                mkrDict["l_toe"],
+                # mkrDict["l_toe"],
                 mkrDict["l_big_toe"],
                 mkrDict["l_calc"],
             ],
         }
         armMkrs = {
             "right": [
-                mkrDict["r_lelbow"],
-                mkrDict["r_melbow"],
+                # mkrDict["r_lelbow"],
+                # mkrDict["r_melbow"],
+                mkrDict["right_elbow"],
                 mkrDict["r_mwrist"],
                 mkrDict["r_lwrist"],
-                mkrDict["r_bpinky"],
-                mkrDict["r_bindex"],
+                # mkrDict["r_bpinky"],
+                # mkrDict["r_bindex"],
             ],
             "left": [
-                mkrDict["l_lelbow"],
-                mkrDict["l_melbow"],
+                # mkrDict["l_lelbow"],
+                # mkrDict["l_melbow"],
+                mkrDict["left_elbow"],
                 mkrDict["l_mwrist"],
                 mkrDict["l_lwrist"],
-                mkrDict["l_bpinky"],
-                mkrDict["l_bindex"],
+                # mkrDict["l_bpinky"],
+                # mkrDict["l_bindex"],
             ],
         }
     else:
@@ -3632,7 +3639,8 @@ def loadPklVideo(
     useAnatomicalMarkers=True,
 ):
     if useAnatomicalMarkers:
-        nb_keypoints = 51
+        # nb_keypoints = 53
+        nb_keypoints = 42
     else:
         nb_keypoints = 25
     open_file = open(pklPath, "rb")

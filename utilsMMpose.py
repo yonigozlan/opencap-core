@@ -6,7 +6,9 @@ import torch.nn as nn
 from mmpose_utils import (concat, convert_instance_to_frame, frame_iter,
                           process_mmdet_results)
 from tqdm import tqdm
-from utils import (getMMposeAnatomicalMarkerNames,
+from utils import (getMMposeAnatomicalCocoMarkerNames,
+                   getMMposeAnatomicalCocoMarkerPairs,
+                   getMMposeAnatomicalMarkerNames,
                    getMMposeAnatomicalMarkerPairs)
 
 from mmpose.apis import init_model as init_pose_estimator
@@ -214,7 +216,6 @@ def pose_inference_updated(
     print("Running pose inference...")
     instances = []
     for batch in tqdm(dataloader):
-        # print("batch keys", batch.keys())
         # print("batch data_samples", batch["data_samples"][0].keys())
         # print("batch inputs", batch["inputs"].keys())
         # batch["img"] = batch["img"].to(device)
@@ -256,8 +257,10 @@ def pose_inference_updated(
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         video_save_file = video_out_path
         videoWriter = cv2.VideoWriter(str(video_save_file), fourcc, fps, size)
-        markerPairs = getMMposeAnatomicalMarkerPairs()
-        markerNames = getMMposeAnatomicalMarkerNames()
+        # markerPairs = getMMposeAnatomicalMarkerPairs()
+        # markerNames = getMMposeAnatomicalMarkerNames()
+        markerPairs = getMMposeAnatomicalCocoMarkerPairs()
+        markerNames = getMMposeAnatomicalCocoMarkerNames()
         for pose_results, img in tqdm(zip(results, frame_iter(cap))):
             # display keypoints and bbox on frame
             preds = pose_results[0]["pred_instances"]
@@ -276,8 +279,10 @@ def pose_inference_updated(
                         color = (0, 0, 255)
 
                     else:
-                        if markerNames[index_kpt-17] in markerPairs.keys():
-                            if markerNames[index_kpt-17][0] == "l":
+                        # if markerNames[index_kpt-17] in markerPairs.keys():
+                        #     if markerNames[index_kpt-17][0] == "l":
+                        if markerNames[index_kpt] in markerPairs.keys():
+                            if markerNames[index_kpt][0] == "l":
                                 color = (255, 255, 0)
                             else:
                                 color = (255, 0, 255)

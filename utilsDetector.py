@@ -9,7 +9,8 @@ import cv2
 import numpy as np
 from constants import constants
 from decouple import config
-from utils import (getMMposeAnatomicalMarkerNames, getMMposeMarkerNames,
+from utils import (getMMposeAnatomicalCocoMarkerNames,
+                   getMMposeAnatomicalMarkerNames, getMMposeMarkerNames,
                    getOpenPoseMarkerNames, getVideoExtension)
 from utilsChecker import getVideoRotation
 
@@ -475,14 +476,19 @@ def arrangeMMposeAnatomicalPkl(poseInferencePklPath, outputPklPath):
     frames = pickle.load(open_file)
     open_file.close()
 
-    markersMMposeAnatomical = getMMposeAnatomicalMarkerNames()
+    markersMMposeAnatomical = getMMposeAnatomicalCocoMarkerNames()
+    # markersMMposeAnatomical = getMMposeAnatomicalMarkerNames()
 
     data4pkl = []
     for c_frame, frame in enumerate(frames):
         data4people = []
         for c, person in enumerate(frame):
-            coordinates = person["pred_instances"]["keypoints"][0, 17:, :]
-            c_coord_out = np.zeros((51 * 3,))
+            # coordinates_anatomical = person["pred_instances"]["keypoints"][0, 17:, :]
+            # coordinates_knees = person["pred_instances"]["keypoints"][0, 13:15, :]
+            # coordinates = np.concatenate((coordinates_anatomical, coordinates_knees), axis=0)
+            # c_coord_out = np.zeros((53 * 3,))
+            coordinates = person["pred_instances"]["keypoints"][0, :, :]
+            c_coord_out = np.zeros((42 * 3,))
             for c_m, marker in enumerate(markersMMposeAnatomical):
                 c_coord = [coordinates[c_m][0], coordinates[c_m][1]]
                 c_coord.append(person["pred_instances"]["keypoint_scores"][0][c_m])

@@ -33,7 +33,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> r_calc r_toe</markers>
+									<markers> r_calc r_big_toe</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
@@ -41,7 +41,7 @@
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> l_calc l_toe</markers>
+									<markers> l_calc l_big_toe</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
@@ -89,11 +89,11 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> r_knee r_ankle</markers>
+									<markers> right_knee r_ankle</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> r_mknee r_mankle</markers>
+									<markers> right_knee r_mankle</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -117,7 +117,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> r_ASIS r_knee</markers>
+									<markers> r_ASIS right_knee</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -145,11 +145,11 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> l_knee l_ankle</markers>
+									<markers> left_knee l_ankle</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> l_mknee l_mankle</markers>
+									<markers> left_knee l_mankle</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -173,7 +173,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> l_ASIS l_knee</markers>
+									<markers> l_ASIS left_knee</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -329,19 +329,19 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> rshoulder r_melbow</markers>
+									<markers> rshoulder right_elbow</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> rshoulder r_melbow</markers>
+									<markers> rshoulder right_elbow</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> lshoulder l_melbow</markers>
+									<markers> lshoulder left_elbow</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> lshoulder l_melbow</markers>
+									<markers> lshoulder left_elbow</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -369,19 +369,19 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> r_mwrist r_melbow</markers>
+									<markers> r_mwrist right_elbow</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> r_lwrist r_melbow</markers>
+									<markers> r_lwrist right_elbow</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> l_mwrist l_melbow</markers>
+									<markers> l_mwrist left_elbow</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> l_lwrist l_melbow</markers>
+									<markers> l_lwrist left_elbow</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -491,17 +491,11 @@
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>10</weight>
 					</IKMarkerTask>
-					<IKMarkerTask name="r_knee">
+					<IKMarkerTask name="right_knee">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
 						<apply>true</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-						<weight>10</weight>
-					</IKMarkerTask>
-					<IKMarkerTask name="r_mknee">
-						<!--Whether or not this task will be used during inverse kinematics solve.-->
-						<apply>true</apply>
-						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-						<weight>10</weight>
+						<weight>20</weight>
 					</IKMarkerTask>
 					<IKMarkerTask name="r_ankle">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
@@ -515,7 +509,7 @@
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>10</weight>
 					</IKMarkerTask>
-					<IKMarkerTask name="r_toe">
+					<IKMarkerTask name="r_big_toe">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
 						<apply>true</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
@@ -533,17 +527,11 @@
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>10</weight>
 					</IKMarkerTask>
-					<IKMarkerTask name="l_knee">
+					<IKMarkerTask name="left_knee">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
 						<apply>true</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-						<weight>10</weight>
-					</IKMarkerTask>
-					<IKMarkerTask name="l_mknee">
-						<!--Whether or not this task will be used during inverse kinematics solve.-->
-						<apply>true</apply>
-						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
-						<weight>10</weight>
+						<weight>20</weight>
 					</IKMarkerTask>
 					<IKMarkerTask name="l_ankle">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
@@ -557,7 +545,7 @@
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>10</weight>
 					</IKMarkerTask>
-					<IKMarkerTask name="l_toe">
+					<IKMarkerTask name="l_big_toe">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
 						<apply>true</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
@@ -575,7 +563,7 @@
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>10</weight>
 					</IKMarkerTask>
-					<IKMarkerTask name="r_melbow">
+					<IKMarkerTask name="right_elbow">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
 						<apply>true</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
@@ -593,7 +581,7 @@
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>5</weight>
 					</IKMarkerTask>
-					<IKMarkerTask name="l_melbow">
+					<IKMarkerTask name="left_elbow">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
 						<apply>true</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->

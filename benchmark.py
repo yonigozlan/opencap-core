@@ -21,12 +21,12 @@ scriptDir = os.getcwd()
 repoDir = os.path.dirname(scriptDir)
 mainDir = getDataDirectory(False)
 dataDir = constants["dataDir"]
-dataName = 'Data_2knees'
+dataName = 'Data'
 outputDir = os.path.join(dataDir, 'Results-paper-augmenterV2')
 
 # %% User inputs.
-# subjects = ['subject4']
-subjects = ["subject" + str(i) for i in range(2, 12)]
+subjects = ['subject4']
+# subjects = ["subject" + str(i) for i in range(2, 12)]
 sessions = ['Session0', 'Session1']
 poseDetectors = ['mmpose_0.8']
 cameraSetups = ['2-cameras']
@@ -523,3 +523,4 @@ wandb.init(project="opencap_bench",
             name="subject4_local",)
 mean_RMSEs_table = wandb.Table(dataframe=mean_RMSEs_df)
 wandb.log({"Mean RMSEs": mean_RMSEs_table})
+# wandb.log(means_RMSEs)

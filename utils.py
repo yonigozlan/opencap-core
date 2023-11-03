@@ -1260,6 +1260,95 @@ def getMMposeMarkerNames():
 
     return markerNames
 
+def getMMposeAnatomicalCocoMarkerNames():
+    marker_names = [
+        "nose",
+        "left_eye",
+        "right_eye",
+        "left_ear",
+        "right_ear",
+        "left_shoulder",
+        "right_shoulder",
+        "left_elbow",
+        "right_elbow",
+        "left_wrist",
+        "right_wrist",
+        "left_hip",
+        "right_hip",
+        "left_knee",
+        "right_knee",
+        "left_ankle",
+        "right_ankle",
+        "sternum",
+        "rshoulder",
+        "lshoulder",
+        "r_lwrist",
+        "l_lwrist",
+        "r_mwrist",
+        "l_mwrist",
+        "r_ASIS",
+        "l_ASIS",
+        "r_PSIS",
+        "l_PSIS",
+        "r_ankle",
+        "l_ankle",
+        "r_mankle",
+        "l_mankle",
+        "r_5meta",
+        "l_5meta",
+        "r_big_toe",
+        "l_big_toe",
+        "l_calc",
+        "r_calc",
+        "C7",
+        "L2",
+        "T11",
+        "T6",
+    ]
+
+    return marker_names
+
+def getMMposeAnatomicalCocoMarkerPairs():
+    markerNames = {
+        "left_eye":"right_eye",
+        "left_ear": "right_ear",
+        "left_shoulder": "right_shoulder",
+        "left_elbow": "right_elbow",
+        "left_wrist": "right_wrist",
+        "left_hip":"right_hip",
+        "left_knee": "right_knee",
+        "left_ankle":"right_ankle",
+        "rshoulder":"lshoulder",
+        "lshoulder":"rshoulder",
+        "r_lelbow":"l_lelbow",
+        "l_lelbow":"r_lelbow",
+        "r_melbow":"l_melbow",
+        "l_melbow":"r_melbow",
+        "r_lwrist":"l_lwrist",
+        "l_lwrist":"r_lwrist",
+        "r_mwrist":"l_mwrist",
+        "l_mwrist":"r_mwrist",
+        "r_ASIS":"l_ASIS",
+        "l_ASIS":"r_ASIS",
+        "r_PSIS":"l_PSIS",
+        "l_PSIS":"r_PSIS",
+        "r_knee":"l_knee",
+        "l_knee":"r_knee",
+        "r_mknee":"l_mknee",
+        "l_mknee":"r_mknee",
+        "r_ankle":"l_ankle",
+        "l_ankle":"r_ankle",
+        "r_mankle":"l_mankle",
+        "l_mankle":"r_mankle",
+        "r_5meta":"l_5meta",
+        "l_5meta":"r_5meta",
+        "r_big_toe":"l_big_toe",
+        "l_big_toe":"r_big_toe",
+        "l_calc":"r_calc",
+        "r_calc":"l_calc",
+    }
+
+    return markerNames
 
 def getMMposeAnatomicalMarkerNames():
     markerNames = [
@@ -1314,6 +1403,8 @@ def getMMposeAnatomicalMarkerNames():
         "L2",
         "T11",
         "T6",
+        "l_knee_center",
+        "r_knee_center",
     ]
 
     return markerNames
@@ -1366,6 +1457,8 @@ def getMMposeAnatomicalMarkerPairs():
         "l_bthumb":"r_bthumb",
         "r_tthumb":"l_tthumb",
         "l_tthumb":"r_tthumb",
+        "r_knee_center":"l_knee_center",
+        "l_knee_center":"r_knee_center",
     }
 
     return markerNames
