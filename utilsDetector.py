@@ -303,6 +303,7 @@ def runMMposeVideo(
     bbox_thr=0.8,
 
 ):
+    print('config_benchmark["model_config_person"]', config_benchmark["model_config_person"])
     model_config_person = config_benchmark["model_config_person"],
     model_ckpt_person = config_benchmark["model_ckpt_person"],
     # model_config_person="demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
@@ -394,6 +395,8 @@ def runMMposeVideo(
 
             # Run human detection.
             bboxPath = os.path.join(pathOutputBox, trialPrefix + ".pkl")
+            print("pathMMpose", pathMMpose)
+            print("model_config_person", model_config_person)
             full_model_config_person = os.path.join(pathMMpose, model_config_person)
             detection_inference(
                 full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=config_benchmark["batch_size_det"]
