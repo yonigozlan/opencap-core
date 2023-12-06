@@ -158,7 +158,7 @@ def process_trials(config):
             if "Session" not in session:
                 continue
             pathSession = os.path.join(pathVideos, session)
-            pathSessionNew = os.path.join(dataDir, "Data", subject + "_" + session)
+            pathSessionNew = os.path.join(dataDir, config["dataName"], subject + "_" + session)
             if os.path.exists(pathSessionNew) and not overwriteRestructuring:
                 continue
             os.makedirs(pathSessionNew, exist_ok=True)
@@ -206,7 +206,7 @@ def process_trials(config):
     for count, sessionName in enumerate(sessionNames):
         # Get trial names.
         pathCam0 = os.path.join(
-            dataDir, "Data", sessionName, "Videos", "Cam0", "InputMedia"
+            dataDir, config["dataName"], sessionName, "Videos", "Cam0", "InputMedia"
         )
         # Work around to re-order trials and have the extrinsics trial firs, and
         # the static second (if available).
@@ -239,7 +239,7 @@ def process_trials(config):
                 # session for each subject (<>_0). We here copy the Model folder
                 # from the first session to the second session.
                 if sessionName[-1] == "1":
-                    sessionDir = os.path.join(dataDir, "Data", sessionName)
+                    sessionDir = os.path.join(dataDir, config["dataName"], sessionName)
                     sessionDir_0 = sessionDir[:-1] + "0"
                     camDir_0 = os.path.join(
                         sessionDir_0,
