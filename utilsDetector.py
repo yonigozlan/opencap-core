@@ -478,7 +478,7 @@ def arrangeMMposeAnatomicalPkl(poseInferencePklPath, outputPklPath):
 
     markersMMposeAnatomical = getMMposeAnatomicalCocoMarkerNames()
     # markersMMposeAnatomical = getMMposeAnatomicalMarkerNames()
-
+    nb_markers = len(markersMMposeAnatomical)
     data4pkl = []
     for c_frame, frame in enumerate(frames):
         data4people = []
@@ -488,7 +488,7 @@ def arrangeMMposeAnatomicalPkl(poseInferencePklPath, outputPklPath):
             # coordinates = np.concatenate((coordinates_anatomical, coordinates_knees), axis=0)
             # c_coord_out = np.zeros((53 * 3,))
             coordinates = person["pred_instances"]["keypoints"][0, :, :]
-            c_coord_out = np.zeros((42 * 3,))
+            c_coord_out = np.zeros((nb_markers * 3,))
             for c_m, marker in enumerate(markersMMposeAnatomical):
                 c_coord = [coordinates[c_m][0], coordinates[c_m][1]]
                 c_coord.append(person["pred_instances"]["keypoint_scores"][0][c_m])

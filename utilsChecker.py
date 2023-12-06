@@ -1220,7 +1220,7 @@ def synchronizeVideoKeypoints(
                 mkrDict["r_ankle"],
                 mkrDict["r_mankle"],
                 mkrDict["r_5meta"],
-                # mkrDict["r_toe"],
+                mkrDict["r_toe"],
                 mkrDict["r_big_toe"],
                 mkrDict["r_calc"],
             ],
@@ -1228,7 +1228,7 @@ def synchronizeVideoKeypoints(
                 mkrDict["l_ankle"],
                 mkrDict["l_mankle"],
                 mkrDict["l_5meta"],
-                # mkrDict["l_toe"],
+                mkrDict["l_toe"],
                 mkrDict["l_big_toe"],
                 mkrDict["l_calc"],
             ],
@@ -3640,7 +3640,7 @@ def loadPklVideo(
 ):
     if useAnatomicalMarkers:
         # nb_keypoints = 53
-        nb_keypoints = 42
+        nb_keypoints = len(getMMposeAnatomicalCocoMarkerNames())
     else:
         nb_keypoints = 25
     open_file = open(pklPath, "rb")

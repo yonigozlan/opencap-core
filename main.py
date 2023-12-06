@@ -14,8 +14,9 @@ import traceback
 import numpy as np
 import scipy
 import yaml
-from utils import (getDataDirectory, getMMposeDirectory, getOpenPoseDirectory,
-                   getVideoExtension, importMetadata, loadCameraParameters)
+from utils import (getDataDirectory, getMMposeAnatomicalCocoMarkerNames,
+                   getMMposeDirectory, getOpenPoseDirectory, getVideoExtension,
+                   importMetadata, loadCameraParameters)
 # from utilsAugmenter import augmentTRC
 from utilsChecker import (autoSelectExtrinsicSolution, calcExtrinsicsFromVideo,
                           isCheckerboardUpsideDown, popNeutralPoseImages,
@@ -376,8 +377,9 @@ def main(
 
         if useAnatomicalMarkers:
             if keypoints3D.shape[2] < 10:
-                keypoints3D = np.zeros((3, 42, 10))
-                confidence3D = np.zeros((1, 42, 10))
+                nb_keypoints = len(getMMposeAnatomicalCocoMarkerNames())
+                keypoints3D = np.zeros((3, nb_keypoints, 10))
+                confidence3D = np.zeros((1, nb_keypoints, 10))
                 # keypoints3D = np.zeros((3, 53, 10))
                 # confidence3D = np.zeros((1, 53, 10))
         else:
