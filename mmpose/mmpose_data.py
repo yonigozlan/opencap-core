@@ -27,6 +27,7 @@ class CustomVideoDataset(Dataset):
 
         # load bbox
         self.bboxs = pickle.load(open(bbox_path, "rb"))
+        print(f"Loaded {len(self.bboxs)} frames from {video_path}")
         self.bbox_threshold = bbox_threshold
 
         # create instance to frame and frame to instance mapping

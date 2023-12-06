@@ -16,6 +16,9 @@ __pycache__
 Data/
 Examples/Data/*
 
+# Logging
+wandb/
+
 # Files for re-processing
 Examples/reprocessSessionServer.py
 
