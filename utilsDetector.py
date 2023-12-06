@@ -7,7 +7,6 @@ import time
 
 import cv2
 import numpy as np
-from benchmark import config
 from decouple import config
 from utils import (getMMposeAnatomicalCocoMarkerNames,
                    getMMposeAnatomicalMarkerNames, getMMposeMarkerNames,
@@ -17,6 +16,7 @@ from utilsChecker import getVideoRotation
 
 # %%
 def runPoseDetector(
+    config_benchmark,
     CameraDirectories,
     trialRelativePath,
     pathPoseDetector,
@@ -60,6 +60,7 @@ def runPoseDetector(
             )
         elif poseDetector == "mmpose":
             runMMposeVideo(
+                config_benchmark,
                 cameraDirectory,
                 trialRelativePath,
                 pathPoseDetector,
@@ -293,19 +294,20 @@ def runOpenPoseCMD(
 
 # %%
 def runMMposeVideo(
+    config_benchmark,
     cameraDirectory,
     fileName,
     pathMMpose,
     trialName,
     generateVideo=True,
     bbox_thr=0.8,
-    model_config_person = config["model_config_person"],
-    model_ckpt_person = config["model_ckpt_person"],
+
+):
+    model_config_person = config_benchmark["model_config_person"],
+    model_ckpt_person = config_benchmark["model_ckpt_person"],
     # model_config_person="demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
     # model_ckpt_person="https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
-    model_config_pose=config["model_config_pose"],
-    model_ckpt_pose=config["model_ckpt_pose"],
-):
+    model_config_pose=config_benchmark["model_config_pose"],
     trialPrefix, _ = os.path.splitext(os.path.basename(fileName))
     videoFullPath = os.path.normpath(os.path.join(cameraDirectory, fileName))
 
@@ -394,11 +396,11 @@ def runMMposeVideo(
             bboxPath = os.path.join(pathOutputBox, trialPrefix + ".pkl")
             full_model_config_person = os.path.join(pathMMpose, model_config_person)
             detection_inference(
-                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=config["batch_size_det"]
+                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=config_benchmark["batch_size_det"]
             )
 
             # Run pose detection.
-            pathModelCkptPose = config["model_ckpt_pose_absolute"]
+            pathModelCkptPose = config_benchmark["model_ckpt_pose_absolute"]
             videoOutPath = os.path.join(
                 pathOutputVideo, trialPrefix + "withKeypoints.mp4"
             )
@@ -410,7 +412,7 @@ def runMMposeVideo(
                 bboxPath,
                 pklPath,
                 videoOutPath,
-                batch_size=config["batch_size_pose"],
+                batch_size=config_benchmark["batch_size_pose"],
                 bbox_thr=bbox_thr,
                 visualize=generateVideo,
             )

@@ -29,6 +29,7 @@ from utilsOpenSim import (generateVisualizerJson, getScaleTimeRange, runIKTool,
 
 
 def main(
+    config,
     sessionName,
     trialName,
     trial_id,
@@ -112,7 +113,7 @@ def main(
     if poseDetector == "OpenPose":
         poseDetectorDirectory = getOpenPoseDirectory(isDocker)
     elif poseDetector == "mmpose":
-        poseDetectorDirectory = getMMposeDirectory(isDocker)
+        poseDetectorDirectory = getMMposeDirectory(config, isDocker)
 
     # %% Camera calibration.
     if runCameraCalibration:
@@ -286,6 +287,7 @@ def main(
         # Run pose detection algorithm.
         # try:
         videoExtension = runPoseDetector(
+            config,
             cameraDirectories,
             trialRelativePath,
             poseDetectorDirectory,

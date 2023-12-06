@@ -64,6 +64,7 @@ from utils import importMetadata
 
 # # %% Functions for re-processing the data.
 def process_trial(
+    config,
     trial_name=None,
     session_name=None,
     isDocker=False,
@@ -85,6 +86,7 @@ def process_trial(
 ):
     # Run main processing pipeline.
     main(
+        config,
         session_name,
         trial_name,
         trial_name,
@@ -284,6 +286,7 @@ def process_trials(config):
                         intrinsicsFinalFolder = "Deployed_720_60fps"
 
                     process_trial(
+                        config,
                         trial,
                         session_name=sessionName,
                         cam2Use=cam2Use,

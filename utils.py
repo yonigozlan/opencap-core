@@ -15,7 +15,6 @@ import pandas as pd
 import requests
 import utilsDataman
 import yaml
-from benchmark import config
 from scipy import signal
 
 # from utilsAuth import getToken
@@ -78,7 +77,7 @@ def getOpenPoseDirectory(isDocker=False):
     return openPoseDirectory
 
 
-def getMMposeDirectory(isDocker=False):
+def getMMposeDirectory(config, isDocker=False):
     computername = socket.gethostname()
 
     # Paths to OpenPose folder for local testing.
