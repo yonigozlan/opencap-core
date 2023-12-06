@@ -1,3 +1,4 @@
+import argparse
 import copy
 import csv
 import os
@@ -8,9 +9,98 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats
 import utilsDataman as dm
-from constants import constants
+import wandb
+from ReproducePaperResults.labValidationVideosToKinematicsAnatomical import \
+    process_trials
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from utils import getDataDirectory, storage2df
+
+config_global = "sherlock" # "local" or "sherlock
+
+config_base_local = {
+    "mmposeDirectory" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/mmpose",
+    "model_config_person" : "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
+    "model_ckpt_person" : "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
+    # "model_config_person" : "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py",
+    # "model_ckpt_person" :"https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth",
+    "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_coco_eval_bedlam-384x288_pretrained.py",
+    "model_ckpt_pose" : "pretrain/hrnet/best_infinity_AP_epoch_21.pth",
+    "dataDir" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data",
+    "batch_size_det": 4,
+    "batch_size_pose": 8
+}
+config_base_local["model_ckpt_pose_absolute"] = os.path.join(config_base_local["mmposeDirectory"], config_base_local["model_ckpt_pose"])
+
+
+config_base_sherlock = {
+    "mmposeDirectory" : "/home/users/yonigoz/RA/mmpose",
+    "model_config_person" : "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py",
+    "model_ckpt_person" :"https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth",
+    # "model_config_person" : "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
+    # "model_ckpt_person" : "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
+    "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_ViTPose-huge_8xb64-210e_merge_bedlam_infinity_eval_bedlam-256x192.py",
+    "model_ckpt_pose" : "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_eval_bedlam/ViT/huge/best_infinity_AP_epoch_10.pth",
+    # "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_coco_eval_bedlam-384x288_pretrained.py",
+    # "model_ckpt_pose" : "/scratch/users/yonigoz/mmpose_data/work_dirs/merge_bedlam_infinity_coco_eval_bedlam/HRNet/w48_dark_pretrained/best_infinity_AP_epoch_18.pth",
+    "dataDir" : "/scratch/users/yonigoz/OpenCap_data",
+    "batch_size_det": 32,
+    "batch_size_pose": 4
+}
+config_base_sherlock["model_ckpt_pose_absolute"] = config_base_sherlock["model_ckpt_pose"]
+
+config = {}
+if config_global == "local":
+    config = config_base_local
+if config_global == "sherlock":
+    config = config_base_sherlock
+
+parser = argparse.ArgumentParser(description='Benchmark OpenCap')
+parser.add_argument('--dataDir', type=str, default=config["dataDir"],
+                    help='Directory where data is stored')
+parser.add_argument('--model_config_person', type=str, default=config["model_config_person"],
+                    help='Model config file for person detector')
+parser.add_argument('--model_ckpt_person', type=str, default=config["model_ckpt_person"],
+                    help='Model checkpoint file for person detector')
+parser.add_argument('--model_config_pose', type=str, default=config["model_config_pose"],
+                    help='Model config file for pose detector')
+parser.add_argument('--model_ckpt_pose', type=str, default=config["model_ckpt_pose"],
+                    help='Model checkpoint file for pose detector')
+parser.add_argument('--batch_size_det', type=int, default=config["batch_size_det"],
+                    help='Batch size for person detector')
+parser.add_argument('--batch_size_pose', type=int, default=config["batch_size_pose"],
+                    help='Batch size for pose detector')
+parser.add_argument('--dataName', type=str, default="Data",
+                    help='Name of data directory where predictions will be stored')
+parser.add_argument('--subjects', type=str, default="all",
+                    help='Subjects to process')
+parser.add_argument('--sessions', type=str, default="all",
+                    help='Sessions to process')
+parser.add_argument('--cameraSetups', type=str, default="2-cameras",
+                    help='Camera setups to process')
+parser.add_argument('--process_trials', type=bool, default=True,
+                    help='Process trials')
+
+
+args = parser.parse_args()
+
+# replace config with args
+config["dataDir"] = args.dataDir
+config["model_config_person"] = args.model_config_person
+config["model_ckpt_person"] = args.model_ckpt_person
+config["model_config_pose"] = args.model_config_pose
+config["model_ckpt_pose"] = args.model_ckpt_pose
+config["batch_size_det"] = args.batch_size_det
+config["batch_size_pose"] = args.batch_size_pose
+config["dataName"] = args.dataName
+config["subjects"] = args.subjects
+config["sessions"] = args.sessions
+config["cameraSetups"] = args.cameraSetups
+config["process_trials"] = args.process_trials
+
+
+if config["process_trials"]:
+    process_trials(config)
+
 
 plots = False
 saveAndOverwriteResults = True
@@ -18,17 +108,25 @@ overwriteResults = False
 
 scriptDir = os.getcwd()
 repoDir = os.path.dirname(scriptDir)
-mainDir = getDataDirectory(False)
-dataDir = constants["dataDir"]
-dataName = 'Data'
-outputDir = os.path.join(dataDir, 'Results-paper-augmenterV2')
+dataDir = config["dataDir"]
+dataName = config["dataName"]
+outputDir = os.path.join(dataDir, dataName, 'joints-metrics')
+#create output directory if it doesn't exist
+if not os.path.exists(outputDir):
+    os.makedirs(outputDir)
 
-# %% User inputs.
-subjects = ['subject4']
-# subjects = ["subject" + str(i) for i in range(2, 12)]
-sessions = ['Session0', 'Session1']
+
+if config["subjects"] == "all":
+    subjects = ["subject" + str(i) for i in range(2, 12)]
+else:
+    subjects = [config["subjects"]]
+if config["sessions"] == "all":
+    sessions = ['Session0', 'Session1']
+else:
+    sessions = [config["sessions"]]
+
 poseDetectors = ['mmpose_0.8']
-cameraSetups = ['2-cameras']
+cameraSetups = [config["cameraSetups"]]
 augmenterTypes = {
     "upsampling"
 }
@@ -394,7 +492,6 @@ if saveAndOverwriteResults:
     np.save(os.path.join(outputDir, 'RMSEs.npy'), RMSEs)
     np.save(os.path.join(outputDir, 'MAEs.npy'), MAEs)
     np.save(os.path.join(outputDir, 'MEs.npy'), MEs)
-print(RMSEs['all'][poseDetector][cameraSetup][augmenterType][processingType])
 
 all_motions = ['all'] + motions
 bps, means_RMSEs, medians_RMSEs, stds_RMSEs = {}, {}, {}, {}
@@ -432,8 +529,6 @@ for motion in all_motions:
         means_RMSEs[motion][coordinate] = [np.mean(c_data[a]) for a in c_data]
         medians_RMSEs[motion][coordinate] = [np.median(c_data[a]) for a in c_data]
         stds_RMSEs[motion][coordinate] = [np.std(c_data[a]) for a in c_data]
-
-print(means_RMSEs)
 
 setups = []
 for processingType in processingTypes:
@@ -514,3 +609,14 @@ with open(os.path.join(outputDir,'RMSEs{}_means.csv'.format(suffixRMSE)), 'w', n
 
             maxs_RMSE_summary[motion][setup]['rotation'] = np.round(np.max(temp_med_rot),1)
             maxs_RMSE_summary[motion][setup]['translation'] = np.round(np.max(temp_med_tr*1000),1)
+
+
+# Add wandb logging
+mean_RMSEs_df = pd.DataFrame(means_RMSEs).transpose().applymap(lambda x: x[0]).reset_index()
+print(mean_RMSEs_df)
+wandb.init(project="opencap_bench",
+            entity="yonigoz",
+            name="subject4_local",)
+mean_RMSEs_table = wandb.Table(dataframe=mean_RMSEs_df)
+wandb.log({"Mean RMSEs": mean_RMSEs_table})
+# wandb.log(means_RMSEs)

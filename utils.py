@@ -15,7 +15,7 @@ import pandas as pd
 import requests
 import utilsDataman
 import yaml
-from constants import constants
+from benchmark import config
 from scipy import signal
 
 # from utilsAuth import getToken
@@ -87,7 +87,7 @@ def getMMposeDirectory(isDocker=False):
             "/home/clarkadmin/Documents/MyRepositories/MoVi_analysis/model_ckpts"
         )
     else:
-        mmposeDirectory = constants["mmposeDirectory"]
+        mmposeDirectory = config["mmposeDirectory"]
     return mmposeDirectory
 
 

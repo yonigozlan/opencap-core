@@ -7,7 +7,7 @@ import time
 
 import cv2
 import numpy as np
-from constants import constants
+from benchmark import config
 from decouple import config
 from utils import (getMMposeAnatomicalMarkerNames, getMMposeMarkerNames,
                    getOpenPoseMarkerNames, getVideoExtension)
@@ -298,12 +298,12 @@ def runMMposeVideo(
     trialName,
     generateVideo=True,
     bbox_thr=0.8,
-    model_config_person = constants["model_config_person"],
-    model_ckpt_person = constants["model_ckpt_person"],
+    model_config_person = config["model_config_person"],
+    model_ckpt_person = config["model_ckpt_person"],
     # model_config_person="demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
     # model_ckpt_person="https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
-    model_config_pose=constants["model_config_pose"],
-    model_ckpt_pose=constants["model_ckpt_pose"],
+    model_config_pose=config["model_config_pose"],
+    model_ckpt_pose=config["model_ckpt_pose"],
 ):
     trialPrefix, _ = os.path.splitext(os.path.basename(fileName))
     videoFullPath = os.path.normpath(os.path.join(cameraDirectory, fileName))
@@ -393,11 +393,11 @@ def runMMposeVideo(
             bboxPath = os.path.join(pathOutputBox, trialPrefix + ".pkl")
             full_model_config_person = os.path.join(pathMMpose, model_config_person)
             detection_inference(
-                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=constants["batch_size_det"]
+                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=config["batch_size_det"]
             )
 
             # Run pose detection.
-            pathModelCkptPose = constants["model_ckpt_pose_absolute"]
+            pathModelCkptPose = config["model_ckpt_pose_absolute"]
             videoOutPath = os.path.join(
                 pathOutputVideo, trialPrefix + "withKeypoints.mp4"
             )
@@ -409,7 +409,7 @@ def runMMposeVideo(
                 bboxPath,
                 pklPath,
                 videoOutPath,
-                batch_size=constants["batch_size_pose"],
+                batch_size=config["batch_size_pose"],
                 bbox_thr=bbox_thr,
                 visualize=generateVideo,
             )
