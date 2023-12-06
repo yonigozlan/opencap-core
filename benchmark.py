@@ -15,16 +15,17 @@ from ReproducePaperResults.labValidationVideosToKinematicsAnatomical import \
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from utils import getDataDirectory, storage2df
 
-config_global = "sherlock" # "local" or "sherlock
+config_global = "local" # "local" or "sherlock
 
 config_base_local = {
     "mmposeDirectory" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/mmpose",
+    "OutputBoxDirectory" : "OutputBox",
     "model_config_person" : "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
     "model_ckpt_person" : "https://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_1x_coco/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth",
     # "model_config_person" : "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py",
     # "model_ckpt_person" :"https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth",
-    "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/td-hm_hrnet-w48_dark-8xb32-210e_merge_bedlam_infinity_coco_eval_bedlam-384x288_pretrained.py",
-    "model_ckpt_pose" : "pretrain/hrnet/best_infinity_AP_epoch_21.pth",
+    "model_config_pose" : "configs/body_2d_keypoint/topdown_heatmap/infinity/hrnet32/td-hm_hrnet-w32_dark-8xb64-210e_merge_bedlam_infinity_coco_3DPW_eval_rich-384x288_pretrained.py",
+    "model_ckpt_pose" : "pretrain/hrnet/best_infinity_AP_epoch_30.pth",
     "dataDir" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data",
     "batch_size_det": 4,
     "batch_size_pose": 8
@@ -34,7 +35,7 @@ config_base_local["model_ckpt_pose_absolute"] = os.path.join(config_base_local["
 
 config_base_sherlock = {
     "mmposeDirectory" : "/home/users/yonigoz/RA/mmpose",
-    "OutputBoxDirectory" : "/scratch/users/yonigoz/OpenCap_data/OutputBox",
+    "OutputBoxDirectory" : "OutputBox",
     "model_config_person" : "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py",
     "model_ckpt_person" :"https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth",
     # "model_config_person" : "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",
@@ -90,7 +91,10 @@ config["model_config_person"] = args.model_config_person
 config["model_ckpt_person"] = args.model_ckpt_person
 config["model_config_pose"] = args.model_config_pose
 config["model_ckpt_pose"] = args.model_ckpt_pose
-config["model_ckpt_pose_absolute"] = config["model_ckpt_pose"]
+if config_global == "local":
+    config["model_ckpt_pose_absolute"] = os.path.join(config["mmposeDirectory"], config["model_ckpt_pose"])
+else:
+    config["model_ckpt_pose_absolute"] = config["model_ckpt_pose"]
 config["batch_size_det"] = args.batch_size_det
 config["batch_size_pose"] = args.batch_size_pose
 config["dataName"] = args.dataName

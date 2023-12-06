@@ -121,7 +121,7 @@ def process_trials(config):
     if config["subjects"] == "all":
         subjects = ["subject" + str(i) for i in range(2, 12)]
     else:
-        subjects = config["subjects"]
+        subjects = [config["subjects"]]
     if config["sessions"] == "all":
         sessions = ["Session0", "Session1"]
     else:
