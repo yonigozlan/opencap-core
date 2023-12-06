@@ -317,6 +317,7 @@ def runMMposeVideo(
 
     # mmposeBoxDir = os.path.join("OutputBox_mmpose", trialName)
     pathOutputBox = os.path.join(cameraDirectory.replace(config_benchmark["dataName"], config_benchmark["OutputBoxDirectory"]), trialName)
+    print("pathOutputBox", pathOutputBox)
     # pathOutputBox = os.path.join(cameraDirectory, mmposeBoxDir)
 
     mmposePklDir = os.path.join("OutputPkl_mmpose_" + str(bbox_thr), trialName)
