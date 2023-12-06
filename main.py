@@ -87,12 +87,13 @@ def main(
 
     # %% Paths and metadata. This gets defined through web app.
     baseDir = os.path.dirname(os.path.abspath(__file__))
-    if dataDir is None:
-        dataDir = getDataDirectory(isDocker)
-    if "dataDir" not in locals():
-        sessionDir = os.path.join(baseDir, "Data", sessionName)
-    else:
-        sessionDir = os.path.join(dataDir, "Data", sessionName)
+    # if dataDir is None:
+    #     dataDir = getDataDirectory(isDocker)
+    # if "dataDir" not in locals():
+    #     sessionDir = os.path.join(baseDir, "Data", sessionName)
+    # else:
+    #     sessionDir = os.path.join(dataDir, "Data", sessionName)
+    sessionDir = os.path.join(config["dataDir"], config["dataName"], sessionName)
     sessionMetadata = importMetadata(os.path.join(sessionDir, "sessionMetadata.yaml"))
     # If pose model defined through web app.
     # if "posemodel" in sessionMetadata:
