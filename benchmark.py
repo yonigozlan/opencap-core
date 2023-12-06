@@ -90,6 +90,7 @@ config["model_config_person"] = args.model_config_person
 config["model_ckpt_person"] = args.model_ckpt_person
 config["model_config_pose"] = args.model_config_pose
 config["model_ckpt_pose"] = args.model_ckpt_pose
+config["model_ckpt_pose_absolute"] = config["model_ckpt_pose"]
 config["batch_size_det"] = args.batch_size_det
 config["batch_size_pose"] = args.batch_size_pose
 config["dataName"] = args.dataName
