@@ -133,7 +133,7 @@ def process_trials(config):
 
     # Select the camera configuration you would like to use.
     # cameraSetups = ['2-cameras', '3-cameras', '5-cameras']
-    cameraSetups = [config["cameraSetup"]]
+    cameraSetups = [config["cameraSetups"]]
 
     # Select the resolution at which you would like to use OpenPose. More details
     # about the options in Examples/reprocessSessions. In the paper, we compared
