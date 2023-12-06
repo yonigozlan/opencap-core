@@ -215,7 +215,7 @@ def runIKTool(
 # specified by thresholdPosition.
 def getScaleTimeRange(
     pathTRCFile,
-    thresholdPosition=0.005,
+    thresholdPosition=0.1,
     thresholdTime=0.3,
     withArms=True,
     withOpenPoseMarkers=False,
