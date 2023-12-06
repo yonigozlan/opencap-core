@@ -5,6 +5,9 @@
 #SBATCH -p gpu
 #SBATCH --nodes=1
 #SBATCH --gpus=1
+#SBATCH -C GPU_MEM:16GB
+#SBATCH --mem=32GB
+#SBATCH --time=40:00:00
 
 conda activate opensim_mm
 ml system

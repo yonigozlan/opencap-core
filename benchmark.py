@@ -34,6 +34,7 @@ config_base_local["model_ckpt_pose_absolute"] = os.path.join(config_base_local["
 
 config_base_sherlock = {
     "mmposeDirectory" : "/home/users/yonigoz/RA/mmpose",
+    "OutputBoxDirectory" : "/scratch/users/yonigoz/OpenCap_data/OutputBox",
     "model_config_person" : "demo/mmdetection_cfg/configs/convnext/cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py",
     "model_ckpt_person" :"https://download.openmmlab.com/mmdetection/v2.0/convnext/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco/cascade_mask_rcnn_convnext-t_p4_w7_fpn_giou_4conv1f_fp16_ms-crop_3x_coco_20220509_204200-8f07c40b.pth",
     # "model_config_person" : "demo/mmdetection_cfg/faster_rcnn_r50_fpn_coco.py",

@@ -315,14 +315,14 @@ def runMMposeVideo(
         cameraDirectory, "OutputMedia_mmpose_" + str(bbox_thr), trialName
     )
 
-    mmposeBoxDir = os.path.join("OutputBox_mmpose", trialName)
-    pathOutputBox = os.path.join(cameraDirectory, mmposeBoxDir)
+    # mmposeBoxDir = os.path.join("OutputBox_mmpose", trialName)
+    pathOutputBox = os.path.join(cameraDirectory.replace(config_benchmark["dataName"], config_benchmark["OutputBoxDirectory"]), trialName)
+    # pathOutputBox = os.path.join(cameraDirectory, mmposeBoxDir)
 
     mmposePklDir = os.path.join("OutputPkl_mmpose_" + str(bbox_thr), trialName)
     pathOutputPkl = os.path.join(cameraDirectory, mmposePklDir)
 
     os.makedirs(pathOutputVideo, exist_ok=True)
-    os.makedirs(pathOutputBox, exist_ok=True)
     os.makedirs(pathOutputPkl, exist_ok=True)
 
     # Get frame rate.
@@ -394,10 +394,12 @@ def runMMposeVideo(
 
             # Run human detection.
             bboxPath = os.path.join(pathOutputBox, trialPrefix + ".pkl")
-            full_model_config_person = os.path.join(pathMMpose, model_config_person)
-            detection_inference(
-                full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=config_benchmark["batch_size_det"]
-            )
+            if not os.path.exists(bboxPath):
+                os.makedirs(pathOutputBox, exist_ok=True)
+                full_model_config_person = os.path.join(pathMMpose, model_config_person)
+                detection_inference(
+                    full_model_config_person, model_ckpt_person, videoFullPath, bboxPath, batch_size=config_benchmark["batch_size_det"]
+                )
 
             # Run pose detection.
             pathModelCkptPose = config_benchmark["model_ckpt_pose_absolute"]
