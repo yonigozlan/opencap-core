@@ -622,7 +622,7 @@ mean_RMSEs_df = pd.DataFrame(means_RMSEs).transpose().applymap(lambda x: x[0]).r
 print(mean_RMSEs_df)
 wandb.init(project="opencap_bench",
             entity="yonigoz",
-            name="subject4_local",)
+            name=config["dataName"])
 mean_RMSEs_table = wandb.Table(dataframe=mean_RMSEs_df)
 wandb.log({"Mean RMSEs": mean_RMSEs_table})
 # wandb.log(means_RMSEs)
