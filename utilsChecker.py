@@ -2505,7 +2505,8 @@ def clean2Dkeypoints(
     confidence_sync_out = np.copy(confidence)
 
     nMkrs = key2D_out.shape[0]
-    markerNames = getOpenPoseMarkerNames()
+    # markerNames = getOpenPoseMarkerNames()
+    markerNames = getMMposeAnatomicalCocoMarkerNames()
 
     # Turn all 0s into nans.
     key2D_out[key2D_out == 0] = np.nan
