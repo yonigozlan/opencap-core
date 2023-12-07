@@ -1394,7 +1394,7 @@ def synchronizeVideoKeypoints(
             )
             confidenceSync.insert(i, np.zeros((keypointList[0].shape[0], 10)))
             nansInOutSync.insert(i, np.array([np.nan, np.nan]))
-        return keypointsSync, confidenceSync, nansInOutSync
+        return keypointsSync, confidenceSync, nansInOutSync, [0, 0]
 
     [idxStart, idxEnd] = [np.min(overlapInds_clean), np.max(overlapInds_clean)]
     idxEnd += 1  # Python indexing system.
