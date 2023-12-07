@@ -2522,12 +2522,12 @@ def clean2Dkeypoints(
             nanInds = []
             faceMarkers = getOpenPoseFaceMarkers()[0]
             # no warning if face marker
-            if not markerNames[i] in faceMarkers:
-                print(
-                    "There were <2 frames with >0 confidence for {}".format(
-                        markerNames[i]
-                    )
+            # if not markerNames[i] in faceMarkers:
+            print(
+                "There were <2 frames with >0 confidence for {}".format(
+                    markerNames[i]
                 )
+            )
         # Turn low confidence values to 0s if >2 cameras.
         # Frames with confidence values of 0s are ignored during triangulation.
         if nCams > 2:
