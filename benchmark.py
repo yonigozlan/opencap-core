@@ -179,7 +179,6 @@ fixed_markers = False # False should be default (better results)
 
 if not os.path.exists(os.path.join(outputDir, 'RMSEs.npy')):
     RMSEs = {}
-    os.makedirs(outputDir)
 else:
     RMSEs = np.load(os.path.join(outputDir, 'RMSEs.npy'), allow_pickle=True).item()
     RMSEs = {}

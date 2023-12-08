@@ -1,7 +1,7 @@
 #!/usr/bin/bash
-#SBATCH --job-name=opencap_bench_test
-#SBATCH --output=opencap_bench_test.out
-#SBATCH --error=opencap_bench_test.err
+#SBATCH --job-name=hrnet48_no_coco
+#SBATCH --output=hrnet48_no_coco.out
+#SBATCH --error=hrnet48_no_coco.err
 #SBATCH -p gpu
 #SBATCH --nodes=1
 #SBATCH --gpus=1
