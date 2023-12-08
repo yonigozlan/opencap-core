@@ -79,9 +79,9 @@ parser.add_argument('--sessions', type=str, default="all",
                     help='Sessions to process')
 parser.add_argument('--cameraSetups', type=str, default="2-cameras",
                     help='Camera setups to process')
-parser.add_argument('--process_trials', type=bool, default=True,
+# process_trials arg: set action to store_true to set to True, otherwise False
+parser.add_argument('--process_trials', action='store_true',
                     help='Process trials')
-
 
 args = parser.parse_args()
 
