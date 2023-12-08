@@ -79,9 +79,9 @@ parser.add_argument('--sessions', type=str, default="all",
                     help='Sessions to process')
 parser.add_argument('--cameraSetups', type=str, default="2-cameras",
                     help='Camera setups to process')
-# process_trials arg: set action to store_true to set to True, otherwise False
-parser.add_argument('--process_trials', action='store_true',
-                    help='Process trials')
+# skip_pipeline arg: set action to store_true to set to True, otherwise False
+parser.add_argument('--skip_pipeline', action='store_true',
+                    help='Skip pipeline and only run benchmark')
 
 args = parser.parse_args()
 
@@ -101,10 +101,10 @@ config["dataName"] = args.dataName
 config["subjects"] = args.subjects
 config["sessions"] = args.sessions
 config["cameraSetups"] = args.cameraSetups
-config["process_trials"] = args.process_trials
+config["skip_pipeline"] = args.skip_pipeline
 
 
-if config["process_trials"]:
+if not config["skip_pipeline"]:
     process_trials(config)
 
 
