@@ -540,7 +540,7 @@ def main(
             try:
                 timeRange4Scaling = getScaleTimeRange(
                     pathTRCFile4Scaling,
-                    thresholdPosition=0.05,
+                    thresholdPosition=0.2,
                     thresholdTime=0.1,
                     removeRoot=True,
                     withAnatomicalMarkers=useAnatomicalMarkers,

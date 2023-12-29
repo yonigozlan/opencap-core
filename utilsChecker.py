@@ -1214,228 +1214,232 @@ def synchronizeVideoKeypoints(
     mkrDict = {mkr: iMkr for iMkr, mkr in enumerate(markerNames)}
 
     # First, remove occluded markers
-    if useAnatomicalMarkers:
-        footMkrs = {
-            "right": [
+    if not bypassSync:
+        if useAnatomicalMarkers:
+            footMkrs = {
+                "right": [
+                    mkrDict["r_ankle"],
+                    mkrDict["r_mankle"],
+                    mkrDict["r_5meta"],
+                    mkrDict["r_toe"],
+                    mkrDict["r_big_toe"],
+                    mkrDict["r_calc"],
+                ],
+                "left": [
+                    mkrDict["l_ankle"],
+                    mkrDict["l_mankle"],
+                    mkrDict["l_5meta"],
+                    mkrDict["l_toe"],
+                    mkrDict["l_big_toe"],
+                    mkrDict["l_calc"],
+                ],
+            }
+            armMkrs = {
+                "right": [
+                    # mkrDict["r_lelbow"],
+                    # mkrDict["r_melbow"],
+                    mkrDict["right_elbow"],
+                    mkrDict["r_mwrist"],
+                    mkrDict["r_lwrist"],
+                    # mkrDict["r_bpinky"],
+                    # mkrDict["r_bindex"],
+                ],
+                "left": [
+                    # mkrDict["l_lelbow"],
+                    # mkrDict["l_melbow"],
+                    mkrDict["left_elbow"],
+                    mkrDict["l_mwrist"],
+                    mkrDict["l_lwrist"],
+                    # mkrDict["l_bpinky"],
+                    # mkrDict["l_bindex"],
+                ],
+            }
+        else:
+            footMkrs = {
+                "right": [
+                    mkrDict["RBigToe"],
+                    mkrDict["RSmallToe"],
+                    mkrDict["RHeel"],
+                    mkrDict["RAnkle"],
+                ],
+                "left": [
+                    mkrDict["LBigToe"],
+                    mkrDict["LSmallToe"],
+                    mkrDict["LHeel"],
+                    mkrDict["LAnkle"],
+                ],
+            }
+            armMkrs = {
+                "right": [mkrDict["RElbow"], mkrDict["RWrist"]],
+                "left": [mkrDict["LElbow"], mkrDict["LWrist"]],
+            }
+
+        plt.close("all")
+
+        # Copy for visualization
+        keypointListUnfilt = copy.deepcopy(keypointList)
+
+        # remove occluded foot markers (uses large differences in confidence)
+        keypointList, confidenceList = zip(
+            *[
+                removeOccludedSide(
+                    keys, conf, footMkrs, confidenceThreshold, visualize=False
+                )
+                for keys, conf in zip(keypointList, confidenceList)
+            ]
+        )
+        # remove occluded arm markers
+        keypointList, confidenceList = zip(
+            *[
+                removeOccludedSide(
+                    keys, conf, armMkrs, confidenceThreshold, visualize=False
+                )
+                for keys, conf in zip(keypointList, confidenceList)
+            ]
+        )
+
+        # Copy for visualization
+        keypointListOcclusionRemoved = copy.deepcopy(keypointList)
+        if useAnatomicalMarkers:
+            # Don't change these. The ankle markers are used for gait detector
+            markers4VertVel = [
                 mkrDict["r_ankle"],
-                mkrDict["r_mankle"],
-                mkrDict["r_5meta"],
-                mkrDict["r_toe"],
-                mkrDict["r_big_toe"],
-                mkrDict["r_calc"],
-            ],
-            "left": [
                 mkrDict["l_ankle"],
-                mkrDict["l_mankle"],
-                mkrDict["l_5meta"],
-                mkrDict["l_toe"],
-                mkrDict["l_big_toe"],
-                mkrDict["l_calc"],
-            ],
-        }
-        armMkrs = {
-            "right": [
-                # mkrDict["r_lelbow"],
-                # mkrDict["r_melbow"],
-                mkrDict["right_elbow"],
+            ]  # R&L Ankles and Heels did best. There are some issues though - like when foot marker velocity is aligned with camera ray
+            markers4HandPunch = [
                 mkrDict["r_mwrist"],
-                mkrDict["r_lwrist"],
-                # mkrDict["r_bpinky"],
-                # mkrDict["r_bindex"],
-            ],
-            "left": [
-                # mkrDict["l_lelbow"],
-                # mkrDict["l_melbow"],
-                mkrDict["left_elbow"],
                 mkrDict["l_mwrist"],
-                mkrDict["l_lwrist"],
-                # mkrDict["l_bpinky"],
-                # mkrDict["l_bindex"],
-            ],
-        }
-    else:
-        footMkrs = {
-            "right": [
-                mkrDict["RBigToe"],
-                mkrDict["RSmallToe"],
-                mkrDict["RHeel"],
+                mkrDict["rshoulder"],
+                mkrDict["lshoulder"],
+            ]
+            markers4Ankles = [mkrDict["r_ankle"], mkrDict["l_ankle"]]
+        else:
+            # Don't change these. The ankle markers are used for gait detector
+            markers4VertVel = [
                 mkrDict["RAnkle"],
-            ],
-            "left": [
-                mkrDict["LBigToe"],
-                mkrDict["LSmallToe"],
-                mkrDict["LHeel"],
                 mkrDict["LAnkle"],
-            ],
-        }
-        armMkrs = {
-            "right": [mkrDict["RElbow"], mkrDict["RWrist"]],
-            "left": [mkrDict["LElbow"], mkrDict["LWrist"]],
-        }
+            ]  # R&L Ankles and Heels did best. There are some issues though - like when foot marker velocity is aligned with camera ray
+            markers4HandPunch = [
+                mkrDict["RWrist"],
+                mkrDict["LWrist"],
+                mkrDict["RShoulder"],
+                mkrDict["LShoulder"],
+            ]
+            markers4Ankles = [mkrDict["RAnkle"], mkrDict["LAnkle"]]
 
-    plt.close("all")
-
-    # Copy for visualization
-    keypointListUnfilt = copy.deepcopy(keypointList)
-
-    # remove occluded foot markers (uses large differences in confidence)
-    keypointList, confidenceList = zip(
-        *[
-            removeOccludedSide(
-                keys, conf, footMkrs, confidenceThreshold, visualize=False
+        # find velocity signals for synchronization
+        nCams = len(keypointList)
+        vertVelList = []
+        mkrSpeedList = []
+        handPunchVertPositionList = []
+        allMarkerList = []
+        for keyRaw, conf in zip(keypointList, confidenceList):
+            keyRaw_clean, _, _, _ = clean2Dkeypoints(
+                keyRaw, conf, confidenceThreshold=confidenceThreshold, nCams=nCams, linearInterp=True
             )
-            for keys, conf in zip(keypointList, confidenceList)
-        ]
-    )
-    # remove occluded arm markers
-    keypointList, confidenceList = zip(
-        *[
-            removeOccludedSide(
-                keys, conf, armMkrs, confidenceThreshold, visualize=False
+            keyRaw_clean_smooth = smoothKeypoints(keyRaw_clean, sdKernel=3)
+            handPunchVertPositionList.append(
+                getPositions(keyRaw_clean_smooth, markers4HandPunch, direction=1)
             )
-            for keys, conf in zip(keypointList, confidenceList)
-        ]
-    )
+            vertVelList.append(
+                getVertVelocity(keyRaw_clean_smooth)
+            )  # doing it again b/c these settings work well for synchronization
+            mkrSpeedList.append(
+                getMarkerSpeed(
+                    keyRaw_clean_smooth, markers4VertVel, confidence=conf, averageVels=False
+                )
+            )  # doing it again b/c these settings work well for synchronization
+            allMarkerList.append(keyRaw_clean_smooth)
 
-    # Copy for visualization
-    keypointListOcclusionRemoved = copy.deepcopy(keypointList)
-    if useAnatomicalMarkers:
-        # Don't change these. The ankle markers are used for gait detector
-        markers4VertVel = [
-            mkrDict["r_ankle"],
-            mkrDict["l_ankle"],
-        ]  # R&L Ankles and Heels did best. There are some issues though - like when foot marker velocity is aligned with camera ray
-        markers4HandPunch = [
-            mkrDict["r_mwrist"],
-            mkrDict["l_mwrist"],
-            mkrDict["rshoulder"],
-            mkrDict["lshoulder"],
-        ]
-        markers4Ankles = [mkrDict["r_ankle"], mkrDict["l_ankle"]]
-    else:
-        # Don't change these. The ankle markers are used for gait detector
-        markers4VertVel = [
-            mkrDict["RAnkle"],
-            mkrDict["LAnkle"],
-        ]  # R&L Ankles and Heels did best. There are some issues though - like when foot marker velocity is aligned with camera ray
-        markers4HandPunch = [
-            mkrDict["RWrist"],
-            mkrDict["LWrist"],
-            mkrDict["RShoulder"],
-            mkrDict["LShoulder"],
-        ]
-        markers4Ankles = [mkrDict["RAnkle"], mkrDict["LAnkle"]]
+        # Find indices with high confidence that overlap between cameras.
+        # Note: Could get creative and do camera pair syncing in the future, based
+        # on cameras with greatest amount of overlapping confidence.
+        overlapInds_clean, minConfLength_all = findOverlap(confidenceList, markers4VertVel)
 
-    # find velocity signals for synchronization
-    nCams = len(keypointList)
-    vertVelList = []
-    mkrSpeedList = []
-    handPunchVertPositionList = []
-    allMarkerList = []
-    for keyRaw, conf in zip(keypointList, confidenceList):
-        keyRaw_clean, _, _, _ = clean2Dkeypoints(
-            keyRaw, conf, confidenceThreshold=confidenceThreshold, nCams=nCams, linearInterp=True
+        # If no overlap found, try with fewer cameras.
+        c_nCams = len(confidenceList)
+        while not np.any(overlapInds_clean) and c_nCams > 2:
+            print(
+                "Could not find overlap with {} cameras - trying with {} cameras".format(
+                    c_nCams, c_nCams - 1
+                )
+            )
+            cam_list = [i for i in range(nCams)]
+            # All possible combination with c_nCams-1 cameras.
+            from itertools import combinations
+
+            combs = set(combinations(cam_list, c_nCams - 1))
+            overlapInds_clean_combs = []
+            for comb in combs:
+                confidenceList_sel = [confidenceList[i] for i in list(comb)]
+                overlapInds_clean_c, minConfLength_c = findOverlap(
+                    confidenceList_sel, markers4VertVel
+                )
+                overlapInds_clean_combs.append(overlapInds_clean_c.flatten())
+            longest_stretch = 0
+            for overlapInds_clean_comb in overlapInds_clean_combs:
+                stretch_size = overlapInds_clean_comb.shape[0]
+                if stretch_size > longest_stretch:
+                    longest_stretch = stretch_size
+                    overlapInds_clean = overlapInds_clean_comb
+            c_nCams -= 1
+
+        # If no overlap found, return 0s.
+        if not np.any(overlapInds_clean):
+            keypointsSync = []
+            confidenceSync = []
+            nansInOutSync = []
+            for i in range(len(cameras2Use)):
+                keypointsSync.insert(
+                    i, np.zeros((keypointList[0].shape[0], 10, keypointList[0].shape[2]))
+                )
+                confidenceSync.insert(i, np.zeros((keypointList[0].shape[0], 10)))
+                nansInOutSync.insert(i, np.array([np.nan, np.nan]))
+            return keypointsSync, confidenceSync, nansInOutSync, [[0, 0], [0, 0]] # temporary, TODO: change the whole sync function (bypass it?)
+
+        [idxStart, idxEnd] = [np.min(overlapInds_clean), np.max(overlapInds_clean)]
+        idxEnd += 1  # Python indexing system.
+        # Take max shift between cameras into account.
+        idxStart = int(np.max([0, idxStart - maxShiftSteps]))
+        idxEnd = int(np.min([idxEnd + maxShiftSteps, minConfLength_all]))
+        # Re-sample the lists
+        vertVelList = [v[idxStart:idxEnd] for v in vertVelList]
+        mkrSpeedList = [v[:, idxStart:idxEnd] for v in mkrSpeedList]
+        handPunchVertPositionList = [
+            p[:, idxStart:idxEnd] for p in handPunchVertPositionList
+        ]
+        allMarkerList = [p[:, idxStart:idxEnd] for p in allMarkerList]
+        confSyncList = [c[:, idxStart:idxEnd] for c in confidenceList]
+
+        # Detect whether it is a gait trial, which determines what sync algorithm
+        # to use. Input right and left ankle marker speeds. Gait should be
+        # detected for all cameras (all but one camera is > 2 cameras) for the
+        # trial to be considered a gait trial.
+
+        # Detect activity, which determines sync function that gets used
+
+        isHandPunch, handForPunch = detectHandPunchAllVideos(
+            handPunchVertPositionList, sampleFreq
         )
-        keyRaw_clean_smooth = smoothKeypoints(keyRaw_clean, sdKernel=3)
-        handPunchVertPositionList.append(
-            getPositions(keyRaw_clean_smooth, markers4HandPunch, direction=1)
-        )
-        vertVelList.append(
-            getVertVelocity(keyRaw_clean_smooth)
-        )  # doing it again b/c these settings work well for synchronization
-        mkrSpeedList.append(
-            getMarkerSpeed(
-                keyRaw_clean_smooth, markers4VertVel, confidence=conf, averageVels=False
-            )
-        )  # doing it again b/c these settings work well for synchronization
-        allMarkerList.append(keyRaw_clean_smooth)
+        if isHandPunch:
+            syncActivity = "handPunch"
+        elif detectGaitAllVideos(
+            mkrSpeedList, allMarkerList, confSyncList, markers4Ankles, sampleFreq
+        ):
+            syncActivity = "gait"
+        else:
+            syncActivity = "general"
 
-    # Find indices with high confidence that overlap between cameras.
-    # Note: Could get creative and do camera pair syncing in the future, based
-    # on cameras with greatest amount of overlapping confidence.
-    overlapInds_clean, minConfLength_all = findOverlap(confidenceList, markers4VertVel)
-
-    # If no overlap found, try with fewer cameras.
-    c_nCams = len(confidenceList)
-    while not np.any(overlapInds_clean) and c_nCams > 2:
-        print(
-            "Could not find overlap with {} cameras - trying with {} cameras".format(
-                c_nCams, c_nCams - 1
-            )
-        )
-        cam_list = [i for i in range(nCams)]
-        # All possible combination with c_nCams-1 cameras.
-        from itertools import combinations
-
-        combs = set(combinations(cam_list, c_nCams - 1))
-        overlapInds_clean_combs = []
-        for comb in combs:
-            confidenceList_sel = [confidenceList[i] for i in list(comb)]
-            overlapInds_clean_c, minConfLength_c = findOverlap(
-                confidenceList_sel, markers4VertVel
-            )
-            overlapInds_clean_combs.append(overlapInds_clean_c.flatten())
-        longest_stretch = 0
-        for overlapInds_clean_comb in overlapInds_clean_combs:
-            stretch_size = overlapInds_clean_comb.shape[0]
-            if stretch_size > longest_stretch:
-                longest_stretch = stretch_size
-                overlapInds_clean = overlapInds_clean_comb
-        c_nCams -= 1
-
-    # If no overlap found, return 0s.
-    if not np.any(overlapInds_clean):
-        keypointsSync = []
-        confidenceSync = []
-        nansInOutSync = []
-        for i in range(len(cameras2Use)):
-            keypointsSync.insert(
-                i, np.zeros((keypointList[0].shape[0], 10, keypointList[0].shape[2]))
-            )
-            confidenceSync.insert(i, np.zeros((keypointList[0].shape[0], 10)))
-            nansInOutSync.insert(i, np.array([np.nan, np.nan]))
-        return keypointsSync, confidenceSync, nansInOutSync, [[0, 0], [0, 0]] # temporary, TODO: change the whole sync function (bypass it?)
-
-    [idxStart, idxEnd] = [np.min(overlapInds_clean), np.max(overlapInds_clean)]
-    idxEnd += 1  # Python indexing system.
-    # Take max shift between cameras into account.
-    idxStart = int(np.max([0, idxStart - maxShiftSteps]))
-    idxEnd = int(np.min([idxEnd + maxShiftSteps, minConfLength_all]))
-    # Re-sample the lists
-    vertVelList = [v[idxStart:idxEnd] for v in vertVelList]
-    mkrSpeedList = [v[:, idxStart:idxEnd] for v in mkrSpeedList]
-    handPunchVertPositionList = [
-        p[:, idxStart:idxEnd] for p in handPunchVertPositionList
-    ]
-    allMarkerList = [p[:, idxStart:idxEnd] for p in allMarkerList]
-    confSyncList = [c[:, idxStart:idxEnd] for c in confidenceList]
-
-    # Detect whether it is a gait trial, which determines what sync algorithm
-    # to use. Input right and left ankle marker speeds. Gait should be
-    # detected for all cameras (all but one camera is > 2 cameras) for the
-    # trial to be considered a gait trial.
-
-    # Detect activity, which determines sync function that gets used
-
-    isHandPunch, handForPunch = detectHandPunchAllVideos(
-        handPunchVertPositionList, sampleFreq
-    )
-    if isHandPunch:
-        syncActivity = "handPunch"
-    elif detectGaitAllVideos(
-        mkrSpeedList, allMarkerList, confSyncList, markers4Ankles, sampleFreq
-    ):
-        syncActivity = "gait"
-    else:
-        syncActivity = "general"
-
-    print("Using " + syncActivity + " sync function.")
+        print("Using " + syncActivity + " sync function.")
 
     # Select filtering frequency based on if it is gait
-    if syncActivity == "gait":
-        filtFreq = filtFreqs["gait"]
-    else:
+    if bypassSync:
         filtFreq = filtFreqs["default"]
+    else:
+        if syncActivity == "gait":
+            filtFreq = filtFreqs["gait"]
+        else:
+            filtFreq = filtFreqs["default"]
 
     # Filter keypoint data
     # sdKernel = sampleFreq/(2*np.pi*filtFreq) # not currently used, but in case using gaussian smoother (smoothKeypoints function) instead of butterworth to filter keypoints
@@ -1444,9 +1448,15 @@ def synchronizeVideoKeypoints(
     confSyncFiltList = []
     nansInOutList = []
     for keyRaw, conf in zip(keypointList, confidenceList):
-        keyRaw_clean, conf_clean, nans_in_out, conf_sync_clean = clean2Dkeypoints(
-            keyRaw, conf, confidenceThreshold, nCams=nCams
-        )
+        if bypassSync:
+            keyRaw_clean = keyRaw
+            conf_clean = conf
+            nans_in_out = None
+            conf_sync_clean = conf
+        else:
+            keyRaw_clean, conf_clean, nans_in_out, conf_sync_clean = clean2Dkeypoints(
+                keyRaw, conf, confidenceThreshold, nCams=nCams
+            )
         keyRaw_clean_filt = filterKeypointsButterworth(
             keyRaw_clean, filtFreq, sampleFreq, order=4
         )
@@ -1463,9 +1473,9 @@ def synchronizeVideoKeypoints(
     # find nSample shift relative to the first camera
     # nSamps = keypointList[0].shape[1]
     if bypassSync:
-        shiftVals = [0 for _ in range(len(vertVelList))]
+        shiftVals = [0 for _ in range(len(keypointList[0]))]
         timeVecs = [
-            np.arange(keypointList[iCam].shape[1]) for iCam in range(len(vertVelList))
+            np.arange(keypointList[iCam].shape[1]) for iCam in range(len(keypointList))
         ]
     else:
         shiftVals = []
@@ -1538,7 +1548,6 @@ def synchronizeVideoKeypoints(
     startEndFrames = []
     nansInOutSync = []
     if bypassSync:
-        print(keyFiltList[0].shape)
         assert (
             len({len(key[0, :]) for key in keyFiltList}) == 1
         ), "All cameras must have same number of frames"

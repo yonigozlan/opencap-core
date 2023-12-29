@@ -103,6 +103,17 @@ config["sessions"] = args.sessions
 config["cameraSetups"] = args.cameraSetups
 config["skip_pipeline"] = args.skip_pipeline
 
+if config["subjects"] == "all":
+    subjects = ["subject" + str(i) for i in range(2, 12)]
+else:
+    subjects = [config["subjects"]]
+if config["sessions"] == "all":
+    sessions = ['Session0', 'Session1']
+else:
+    print("config[sessions", config["sessions"])
+    sessions = [config["sessions"]]
+    config["sessions"] = sessions
+
 
 if not config["skip_pipeline"]:
     process_trials(config)
@@ -122,14 +133,6 @@ if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
 
-if config["subjects"] == "all":
-    subjects = ["subject" + str(i) for i in range(2, 12)]
-else:
-    subjects = [config["subjects"]]
-if config["sessions"] == "all":
-    sessions = ['Session0', 'Session1']
-else:
-    sessions = [config["sessions"]]
 
 poseDetectors = ['mmpose_0.8']
 cameraSetups = [config["cameraSetups"]]
