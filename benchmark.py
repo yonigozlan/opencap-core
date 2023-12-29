@@ -15,7 +15,7 @@ from ReproducePaperResults.labValidationVideosToKinematicsAnatomical import \
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from utils import getDataDirectory, storage2df
 
-config_global = "local" # "local" or "sherlock
+config_global = "sherlock" # "local" or "sherlock
 
 config_base_local = {
     "mmposeDirectory" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/mmpose",
