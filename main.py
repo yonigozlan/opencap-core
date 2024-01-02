@@ -53,6 +53,7 @@ def main(
     overwriteAugmenterModel=False,
     useAnatomicalMarkers=True,
     runUpsampling=True,
+    useGTscaling=True,
 ):
     # %% High-level settings.
     # Camera calibration.
@@ -518,11 +519,11 @@ def main(
             suffix_model = ""
 
         # Scaling.
-        if scaleModel:
+        if scaleModel and not useGTscaling:
             os.makedirs(outputScaledModelDir, exist_ok=True)
             # Path setup file.
             genericSetupFile4ScalingName = (
-                "Setup_scaling_RajagopalModified2016_withArms_KA_mmpose_anatomical.xml"
+                "Setup_scaling_RajagopalModified2016_withArms_KA_mmpose_final.xml"
             )
             pathGenericSetupFile4Scaling = os.path.join(
                 openSimPipelineDir, "Scaling", genericSetupFile4ScalingName
@@ -578,16 +579,21 @@ def main(
             pathOutputIK = pathScaledModel[:-5] + ".mot"
 
         # Inverse kinematics.
-        if not scaleModel:
+        if not scaleModel or useGTscaling:
             outputIKDir = os.path.join(openSimDir, "Kinematics")
             os.makedirs(outputIKDir, exist_ok=True)
             # Check if there is a scaled model.
-            pathScaledModel = os.path.join(
-                outputScaledModelDir, sessionMetadata["openSimModel"] + "_scaled.osim"
-            )
+            if useGTscaling:
+                pathScaledModel = os.path.join(
+                    sessionDir, "LaiArnoldModified2017_poly_withArms_weldHand_scaled.osim"
+                )
+            else:
+                pathScaledModel = os.path.join(
+                    outputScaledModelDir, sessionMetadata["openSimModel"] + "_scaled.osim"
+                )
             if os.path.exists(pathScaledModel):
                 # Path setup file.
-                genericSetupFile4IKName = "Setup_IK_mmpose_anatomical{}.xml".format(
+                genericSetupFile4IKName = "Setup_IK_mmpose_final{}.xml".format(
                     suffix_model
                 )
                 pathGenericSetupFile4IK = os.path.join(

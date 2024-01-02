@@ -166,6 +166,9 @@ def process_trials(config):
             pathMetadata = os.path.join(pathSubject, "sessionMetadata.yaml")
             shutil.copy2(pathMetadata, pathSessionNew)
             pathMetadataNew = os.path.join(pathSessionNew, "sessionMetadata.yaml")
+            # Copy GT osim scaled model
+            pathModel = os.path.join(pathSubject, "OpenSimData", "Mocap", "Model", "LaiArnoldModified2017_poly_withArms_weldHand_scaled.osim")
+            shutil.copy2(pathModel, pathSessionNew)
             # Adjust model name
             sessionMetadata = importMetadata(pathMetadataNew)
             sessionMetadata["openSimModel"] = "LaiUhlrich2022"
