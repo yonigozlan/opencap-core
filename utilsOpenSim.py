@@ -222,9 +222,12 @@ def getScaleTimeRange(
     isMocap=False,
     withAnatomicalMarkers=True,
     removeRoot=False,
+    useWholeSeq=False
 ):
     c_trc_file = utilsDataman.TRCFile(pathTRCFile)
     c_trc_time = c_trc_file.time
+    if useWholeSeq:
+        return [c_trc_time[0], c_trc_time[-1]]
     if withOpenPoseMarkers:
         # No big toe markers, such as to include both OpenPose and mmpose.
         markers = [

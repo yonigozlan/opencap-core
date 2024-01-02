@@ -544,6 +544,7 @@ def main(
                     thresholdTime=0.1,
                     removeRoot=True,
                     withAnatomicalMarkers=useAnatomicalMarkers,
+                    useWholeSeq=True
                 )
                 # Run scale tool.
                 print("Running Scaling")
