@@ -83,6 +83,7 @@ def process_trial(
     calibrationOptions=None,
     offset=True,
     dataDir=None,
+    useGTscaling=True
 ):
     # Run main processing pipeline.
     main(
@@ -106,6 +107,7 @@ def process_trial(
         benchmark=benchmark,
         offset=offset,
         dataDir=dataDir,
+        useGTscaling=useGTscaling
     )
 
     return
@@ -113,6 +115,7 @@ def process_trial(
 
 def process_trials(config):
     dataDir = config["dataDir"]
+    useGTscaling = config["useGTscaling"]
 
     # The dataset includes 2 sessions per subject.The first session includes
     # static, sit-to-stand, squat, and drop jump trials. The second session
@@ -241,7 +244,7 @@ def process_trials(config):
                 # model. The static trials were collected as part of the first
                 # session for each subject (<>_0). We here copy the Model folder
                 # from the first session to the second session.
-                if sessionName[-1] == "1":
+                if sessionName[-1] == "1" and not useGTscaling:
                     sessionDir = os.path.join(dataDir, config["dataName"], sessionName)
                     sessionDir_0 = sessionDir[:-1] + "0"
                     camDir_0 = os.path.join(
@@ -301,4 +304,5 @@ def process_trials(config):
                         scaleModel=scaleModel,
                         augmenter_model=augmenter_model,
                         dataDir=dataDir,
+                        useGTscaling=useGTscaling
                     )

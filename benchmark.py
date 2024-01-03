@@ -15,7 +15,7 @@ from ReproducePaperResults.labValidationVideosToKinematicsAnatomical import \
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from utils import getDataDirectory, storage2df
 
-config_global = "sherlock" # "local" or "sherlock
+config_global = "sherlock" # "local" or "sherlock"
 
 config_base_local = {
     "mmposeDirectory" : "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/mmpose",
@@ -82,6 +82,8 @@ parser.add_argument('--cameraSetups', type=str, default="2-cameras",
 # skip_pipeline arg: set action to store_true to set to True, otherwise False
 parser.add_argument('--skip_pipeline', action='store_true',
                     help='Skip pipeline and only run benchmark')
+parser.add_argument('--computeScale', action='store_true', default=False,
+                    help='Compute scale for each trial')
 
 args = parser.parse_args()
 
@@ -102,6 +104,7 @@ config["subjects"] = args.subjects
 config["sessions"] = args.sessions
 config["cameraSetups"] = args.cameraSetups
 config["skip_pipeline"] = args.skip_pipeline
+config["useGTscaling"] = not args.computeScale
 
 if config["subjects"] == "all":
     subjects = ["subject" + str(i) for i in range(2, 12)]
