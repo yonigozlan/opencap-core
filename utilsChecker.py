@@ -1043,9 +1043,9 @@ def synchronizeVideos(
     trialName=None,
     bbox_thr=0.8,
     resolutionPoseDetection="default",
-    use_anatomical_markers=True,
+    marker_set="Anatomical",
 ):
-    if use_anatomical_markers:
+    if marker_set=="Anatomical":
         markerNames = getMMposeAnatomicalCocoMarkerNames()
     else:
         markerNames = getOpenPoseMarkerNames()
@@ -1087,6 +1087,7 @@ def synchronizeVideos(
             videoFullPath,
             imageBasedTracker=imageBasedTracker,
             poseDetector=poseDetector,
+            marker_set=marker_set,
         )
         thisVideo = cv2.VideoCapture(videoFullPath[:-4] + "_rotated.avi")
         frameRate = np.round(thisVideo.get(cv2.CAP_PROP_FPS))
@@ -1174,7 +1175,7 @@ def synchronizeVideoKeypoints(
     CameraDirectories=None,
     trialName=None,
     trialID="",
-    useAnatomicalMarkers=True,
+    marker_set="Anatomical",
     bypassSync=True,
 ):
     visualize2Dkeypoint = False  # this is a visualization just for testing what filtered input data looks like
@@ -1206,16 +1207,17 @@ def synchronizeVideoKeypoints(
         c_cameras2Use.pop(idxBadCamera)
         c_CameraDirectories.pop(idxBadCamera)
 
-    if useAnatomicalMarkers:
-        # markerNames = getMMposeAnatomicalMarkerNames()
-        markerNames = getMMposeAnatomicalCocoMarkerNames()
-    else:
-        markerNames = getOpenPoseMarkerNames()
-    mkrDict = {mkr: iMkr for iMkr, mkr in enumerate(markerNames)}
 
     # First, remove occluded markers
     if not bypassSync:
-        if useAnatomicalMarkers:
+        if marker_set=="Anatomical":
+            # markerNames = getMMposeAnatomicalMarkerNames()
+            markerNames = getMMposeAnatomicalCocoMarkerNames()
+        else:
+            markerNames = getOpenPoseMarkerNames()
+        mkrDict = {mkr: iMkr for iMkr, mkr in enumerate(markerNames)}
+
+        if marker_set=="Anatomical":
             footMkrs = {
                 "right": [
                     mkrDict["r_ankle"],
@@ -1300,7 +1302,7 @@ def synchronizeVideoKeypoints(
 
         # Copy for visualization
         keypointListOcclusionRemoved = copy.deepcopy(keypointList)
-        if useAnatomicalMarkers:
+        if marker_set=="Anatomical":
             # Don't change these. The ankle markers are used for gait detector
             markers4VertVel = [
                 mkrDict["r_ankle"],
@@ -3552,7 +3554,7 @@ def writeTRCfrom3DKeypoints(
     keypointNames,
     frameRate=60,
     rotationAngles={},
-    useAnatomicalMarkers=True,
+    marker_set="Anatomical",
 ):
     keypoints3D_res = np.empty(
         (keypoints3D.shape[2], keypoints3D.shape[0] * keypoints3D.shape[1])
@@ -3567,7 +3569,7 @@ def writeTRCfrom3DKeypoints(
     # Change units to save data in m.
     keypoints3D_res /= 1000
 
-    if useAnatomicalMarkers:
+    if marker_set=="Anatomical":
         keypoints3D_res_sel = keypoints3D_res
         keypointNames_sel = keypointNames
     else:
@@ -3646,9 +3648,9 @@ def loadPklVideo(
     videoFullPath,
     imageBasedTracker=False,
     poseDetector="OpenPose",
-    useAnatomicalMarkers=True,
+    marker_set="Anatomical",
 ):
-    if useAnatomicalMarkers:
+    if marker_set=="Anatomical":
         # nb_keypoints = 53
         nb_keypoints = len(getMMposeAnatomicalCocoMarkerNames())
     else:

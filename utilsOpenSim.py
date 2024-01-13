@@ -43,7 +43,7 @@ def runScaleTool(
             markerSetFileName = "RajagopalModified2016_markers_mocap{}.xml".format(
                 suffix_model
             )
-        elif "anatomical" in setupFileName:
+        elif "anatomical" in setupFileName or "final" in setupFileName:
             markerSetFileName = "RajagopalModified2016_markers_mmpose_final.xml"
         elif "openpose" in setupFileName:
             markerSetFileName = "RajagopalModified2016_markers_openpose.xml"
@@ -218,9 +218,8 @@ def getScaleTimeRange(
     thresholdPosition=0.05,
     thresholdTime=0.1,
     withArms=True,
-    withOpenPoseMarkers=False,
     isMocap=False,
-    withAnatomicalMarkers=True,
+    marker_set="Anatomical",
     removeRoot=False,
     useWholeSeq=False
 ):
@@ -228,7 +227,7 @@ def getScaleTimeRange(
     c_trc_time = c_trc_file.time
     if useWholeSeq:
         return [c_trc_time[0], c_trc_time[-1]]
-    if withOpenPoseMarkers:
+    if marker_set=="Coco" or marker_set=="OpenPose":
         # No big toe markers, such as to include both OpenPose and mmpose.
         markers = [
             "Neck",
@@ -249,7 +248,7 @@ def getScaleTimeRange(
             "RWrist",
             "LWrist",
         ]
-    elif withAnatomicalMarkers:
+    elif marker_set=="Anatomical":
         markers = [
         "nose",
         "left_eye",

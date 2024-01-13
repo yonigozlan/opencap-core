@@ -116,6 +116,8 @@ def process_trial(
 def process_trials(config):
     dataDir = config["dataDir"]
     useGTscaling = config["useGTscaling"]
+    if config["marker_set"] != "Anatomical":
+        useGTscaling = False
 
     # The dataset includes 2 sessions per subject.The first session includes
     # static, sit-to-stand, squat, and drop jump trials. The second session
@@ -170,8 +172,9 @@ def process_trials(config):
             shutil.copy2(pathMetadata, pathSessionNew)
             pathMetadataNew = os.path.join(pathSessionNew, "sessionMetadata.yaml")
             # Copy GT osim scaled model
-            pathModel = os.path.join(pathSubject, "OpenSimData", "Mocap", "Model", "LaiArnoldModified2017_poly_withArms_weldHand_scaled.osim")
-            shutil.copy2(pathModel, pathSessionNew)
+            if useGTscaling:
+                pathModel = os.path.join(pathSubject, "OpenSimData", "Mocap", "Model", "LaiArnoldModified2017_poly_withArms_weldHand_scaled.osim")
+                shutil.copy2(pathModel, pathSessionNew)
             # Adjust model name
             sessionMetadata = importMetadata(pathMetadataNew)
             sessionMetadata["openSimModel"] = "LaiUhlrich2022"

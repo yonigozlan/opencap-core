@@ -418,11 +418,15 @@ def runMMposeVideo(
                 batch_size=config_benchmark["batch_size_pose"],
                 bbox_thr=bbox_thr,
                 visualize=generateVideo,
+                marker_set=config_benchmark["marker_set"],
             )
 
         # Post-process data to have OpenPose-like file structure.
         # arrangeMMposePkl(pklPath, ppPklPath)
-        arrangeMMposeAnatomicalPkl(pklPath, ppPklPath)
+        if config_benchmark["marker_set"] == "Anatomical":
+            arrangeMMposeAnatomicalPkl(pklPath, ppPklPath)
+        elif config_benchmark["marker_set"] == "Coco":
+            arrangeMMposePkl(pklPath, ppPklPath)
 
 
 # %%
@@ -438,7 +442,11 @@ def arrangeMMposePkl(poseInferencePklPath, outputPklPath):
     for c_frame, frame in enumerate(frames):
         data4people = []
         for c, person in enumerate(frame):
-            coordinates = person["preds_with_flip"].tolist()
+            # coordinates = person["preds_with_flip"].tolist()
+            coordinates = person["pred_instances"]["keypoints"][0, :, :]
+            confidence = person["pred_instances"]["keypoint_scores"][0, :]
+            # stack confidence with coordinates
+            coordinates = np.column_stack((coordinates, confidence))
             c_coord_out = np.zeros((25 * 3,))
             for c_m, marker in enumerate(markersOpenPose):
                 if marker == "midHip":

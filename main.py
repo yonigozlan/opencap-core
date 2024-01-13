@@ -51,7 +51,6 @@ def main(
     benchmark=False,
     dataDir=None,
     overwriteAugmenterModel=False,
-    useAnatomicalMarkers=True,
     runUpsampling=True,
     useGTscaling=True,
 ):
@@ -335,6 +334,7 @@ def main(
                 poseDetector=poseDetector,
                 trialName=trialName,
                 resolutionPoseDetection=resolutionPoseDetection,
+                marker_set=config["marker_set"]
             )
         except Exception as e:
             if len(e.args) == 2:  # specific exception
@@ -379,7 +379,7 @@ def main(
                 exception = "Triangulation failed. Verify your setup and try again. Visit https://www.opencap.ai/best-pratices to learn more about data collection and https://www.opencap.ai/troubleshooting for potential causes for a failed trial."
                 raise Exception(exception, traceback.format_exc())
 
-        if useAnatomicalMarkers:
+        if config["marker_set"] == "anatomical":
             if keypoints3D.shape[2] < 10:
                 nb_keypoints = len(getMMposeAnatomicalCocoMarkerNames())
                 keypoints3D = np.zeros((3, nb_keypoints, 10))
@@ -522,9 +522,14 @@ def main(
         if scaleModel and not useGTscaling:
             os.makedirs(outputScaledModelDir, exist_ok=True)
             # Path setup file.
-            genericSetupFile4ScalingName = (
-                "Setup_scaling_RajagopalModified2016_withArms_KA_mmpose_final.xml"
-            )
+            if config["marker_set"] == "Anatomical":
+                genericSetupFile4ScalingName = (
+                    "Setup_scaling_RajagopalModified2016_withArms_KA_mmpose_final.xml"
+                )
+            elif config["marker_set"] == "Coco":
+                genericSetupFile4ScalingName = (
+                    "Setup_scaling_RajagopalModified2016_withArms_KA_mmpose.xml"
+                )
             pathGenericSetupFile4Scaling = os.path.join(
                 openSimPipelineDir, "Scaling", genericSetupFile4ScalingName
             )
@@ -544,7 +549,7 @@ def main(
                     thresholdPosition=0.2,
                     thresholdTime=0.1,
                     removeRoot=True,
-                    withAnatomicalMarkers=useAnatomicalMarkers,
+                    marker_set=config["marker_set"],
                     useWholeSeq=True
                 )
                 # Run scale tool.
@@ -593,9 +598,14 @@ def main(
                 )
             if os.path.exists(pathScaledModel):
                 # Path setup file.
-                genericSetupFile4IKName = "Setup_IK_mmpose_final{}.xml".format(
-                    suffix_model
-                )
+                if config["marker_set"] == "Anatomical":
+                    genericSetupFile4IKName = "Setup_IK_mmpose_final{}.xml".format(
+                        suffix_model
+                    )
+                elif config["marker_set"] == "Coco":
+                    genericSetupFile4IKName = "Setup_IK_mmpose{}.xml".format(
+                        suffix_model
+                    )
                 pathGenericSetupFile4IK = os.path.join(
                     openSimPipelineDir, "IK", genericSetupFile4IKName
                 )

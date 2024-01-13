@@ -9,7 +9,7 @@ from tqdm import tqdm
 from utils import (getMMposeAnatomicalCocoMarkerNames,
                    getMMposeAnatomicalCocoMarkerPairs,
                    getMMposeAnatomicalMarkerNames,
-                   getMMposeAnatomicalMarkerPairs)
+                   getMMposeAnatomicalMarkerPairs, getMMposeMarkerNames)
 
 from mmpose.apis import init_model as init_pose_estimator
 from mmpose.registry import VISUALIZERS
@@ -185,6 +185,7 @@ def pose_inference_updated(
     bbox_thr=0.95,
     visualize=True,
     save_results=True,
+    marker_set="Anatomical",
 ):
     """Run pose inference on custom video dataset"""
 
@@ -259,58 +260,69 @@ def pose_inference_updated(
         videoWriter = cv2.VideoWriter(str(video_save_file), fourcc, fps, size)
         # markerPairs = getMMposeAnatomicalMarkerPairs()
         # markerNames = getMMposeAnatomicalMarkerNames()
-        markerPairs = getMMposeAnatomicalCocoMarkerPairs()
-        markerNames = getMMposeAnatomicalCocoMarkerNames()
-        for pose_results, img in tqdm(zip(results, frame_iter(cap))):
-            # display keypoints and bbox on frame
-            preds = pose_results[0]["pred_instances"]
-            for index_person in range(len(preds["bboxes"])):
-                bbox = preds["bboxes"][index_person]
-                kpts = preds["keypoints"][index_person]
-                cv2.rectangle(
-                    img,
-                    (int(bbox[0]), int(bbox[1])),
-                    (int(bbox[2]), int(bbox[3])),
-                    (0, 255, 0),
-                    2,
-                )
-                for index_kpt in range(len(kpts)):
-                    if index_kpt < 17:
-                        color = (0, 0, 255)
-
-                    else:
-                        # if markerNames[index_kpt-17] in markerPairs.keys():
-                        #     if markerNames[index_kpt-17][0] == "l":
-                        if markerNames[index_kpt] in markerPairs.keys():
-                            if markerNames[index_kpt][0] == "l":
-                                color = (255, 255, 0)
-                            else:
-                                color = (255, 0, 255)
-                        else:
-                            color = (255, 0, 0)
-
-                    cv2.circle(
+        if marker_set == "Anatomical":
+            markerPairs = getMMposeAnatomicalCocoMarkerPairs()
+            markerNames = getMMposeAnatomicalCocoMarkerNames()
+            for pose_results, img in tqdm(zip(results, frame_iter(cap))):
+                # display keypoints and bbox on frame
+                preds = pose_results[0]["pred_instances"]
+                for index_person in range(len(preds["bboxes"])):
+                    bbox = preds["bboxes"][index_person]
+                    kpts = preds["keypoints"][index_person]
+                    cv2.rectangle(
                         img,
-                        (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
-                        3,
-                        color,
-                        -1,
+                        (int(bbox[0]), int(bbox[1])),
+                        (int(bbox[2]), int(bbox[3])),
+                        (0, 255, 0),
+                        2,
                     )
-            # visualizer.add_datasample(
-            #     "result",
-            #     img,
-            #     data_sample=pose_results,
-            #     draw_gt=False,
-            #     draw_heatmap=False,
-            #     draw_bbox=True,
-            #     show_kpt_idx=False,
-            #     skeleton_style="mmpose",
-            #     show=False,
-            #     wait_time=0.001,
-            #     kpt_thr=0.3,
-            # )
-            # frame_vis = visualizer.get_image()
-            videoWriter.write(img)
+                    for index_kpt in range(len(kpts)):
+                        if index_kpt < 17:
+                            color = (0, 0, 255)
+
+                        else:
+                            # if markerNames[index_kpt-17] in markerPairs.keys():
+                            #     if markerNames[index_kpt-17][0] == "l":
+                            if markerNames[index_kpt] in markerPairs.keys():
+                                if markerNames[index_kpt][0] == "l":
+                                    color = (255, 255, 0)
+                                else:
+                                    color = (255, 0, 255)
+                            else:
+                                color = (255, 0, 0)
+
+                        cv2.circle(
+                            img,
+                            (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
+                            3,
+                            color,
+                            -1,
+                        )
+                videoWriter.write(img)
+        elif marker_set == "Coco":
+            for pose_results, img in tqdm(zip(results, frame_iter(cap))):
+                # display keypoints and bbox on frame
+                preds = pose_results[0]["pred_instances"]
+                for index_person in range(len(preds["bboxes"])):
+                    bbox = preds["bboxes"][index_person]
+                    kpts = preds["keypoints"][index_person]
+                    cv2.rectangle(
+                        img,
+                        (int(bbox[0]), int(bbox[1])),
+                        (int(bbox[2]), int(bbox[3])),
+                        (0, 255, 0),
+                        2,
+                    )
+                    for index_kpt in range(len(getMMposeMarkerNames())):
+                        color = (0, 0, 255)
+                        cv2.circle(
+                            img,
+                            (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
+                            3,
+                            color,
+                            -1,
+                        )
+                videoWriter.write(img)
         videoWriter.release()
 
 
