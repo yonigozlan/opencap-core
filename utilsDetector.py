@@ -390,7 +390,7 @@ def runMMposeVideo(
         else:
             c_path = os.path.dirname(os.path.abspath(__file__))
             sys.path.append(os.path.join(c_path, "mmpose"))
-            if config_benchmark["alt_model"] is "VirtualMarker":
+            if config_benchmark["alt_model"] == "VirtualMarker":
                 from utilsMMpose import detection_inference
                 from utilsPose import pose_inference_updated
             else:
