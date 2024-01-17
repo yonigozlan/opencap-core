@@ -317,7 +317,6 @@ def runMMposeVideo(
 
     # mmposeBoxDir = os.path.join("OutputBox_mmpose", trialName)
     pathOutputBox = os.path.join(cameraDirectory.replace(config_benchmark["dataName"], config_benchmark["OutputBoxDirectory"]), trialName)
-    print("pathOutputBox", pathOutputBox)
     # pathOutputBox = os.path.join(cameraDirectory, mmposeBoxDir)
 
     mmposePklDir = os.path.join("OutputPkl_mmpose_" + str(bbox_thr), trialName)
@@ -391,7 +390,12 @@ def runMMposeVideo(
         else:
             c_path = os.path.dirname(os.path.abspath(__file__))
             sys.path.append(os.path.join(c_path, "mmpose"))
-            from utilsMMpose import detection_inference, pose_inference_updated
+            if config_benchmark["alt_model"] is "VirtualMarker":
+                from utilsMMpose import detection_inference
+                from utilsPose import pose_inference_updated
+            else:
+                from utilsMMpose import (detection_inference,
+                                         pose_inference_updated)
 
             # Run human detection.
             bboxPath = os.path.join(pathOutputBox, trialPrefix + ".pkl")
@@ -423,11 +427,14 @@ def runMMposeVideo(
 
         # Post-process data to have OpenPose-like file structure.
         # arrangeMMposePkl(pklPath, ppPklPath)
-        if config_benchmark["marker_set"] == "Anatomical":
-            arrangeMMposeAnatomicalPkl(pklPath, ppPklPath)
-        elif config_benchmark["marker_set"] == "Coco":
-            arrangeMMposePkl(pklPath, ppPklPath)
-
+        if config_benchmark["alt_model"] is None:
+            if config_benchmark["marker_set"] == "Anatomical":
+                arrangeMMposeAnatomicalPkl(pklPath, ppPklPath)
+            elif config_benchmark["marker_set"] == "Coco":
+                arrangeMMposePkl(pklPath, ppPklPath)
+        else:
+            # copy pklPath to ppPklPath
+            shutil.copy(pklPath, ppPklPath)
 
 # %%
 def arrangeMMposePkl(poseInferencePklPath, outputPklPath):

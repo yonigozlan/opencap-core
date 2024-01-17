@@ -984,7 +984,6 @@ def preprocess2Dkeypoints(key2D, confidence, baseThreshold=10):
     markerNames = getMMposeAnatomicalCocoMarkerNames()
     markerPairs = getMMposeAnatomicalCocoMarkerPairs()
     for iFrame in range(1, key2D.shape[1]):
-        print("frame", iFrame)
         already_processed = []
         for iMarker in range(key2D.shape[0]):
             markerName = markerNames[iMarker]
@@ -1550,6 +1549,7 @@ def synchronizeVideoKeypoints(
     startEndFrames = []
     nansInOutSync = []
     if bypassSync:
+        print({len(key[0, :]) for key in keyFiltList})
         assert (
             len({len(key[0, :]) for key in keyFiltList}) == 1
         ), "All cameras must have same number of frames"

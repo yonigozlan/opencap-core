@@ -231,6 +231,7 @@ def pose_inference_updated(
     # results = concat(instances)
     results = merge_data_samples(instances)
     results = convert_instance_to_frame(results, dataset.frame_to_instance)
+    # print("results", results, len(results), results[0][0].keys())
     # run pose tracking
     # results = run_pose_tracking(results)
 
