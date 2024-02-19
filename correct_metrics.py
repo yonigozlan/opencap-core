@@ -69,7 +69,7 @@ def get_best_shifts_for_metric(exercises_dict, metric):
 
                 lowest_mse = 100000
                 best_shift = 0
-                for shift in range(-50, 50):
+                for shift in range(-100, 100):
                     df_shifted = df.shift(shift)
                     df_diff = df_shifted - df_gt
                     df_diff = df_diff.dropna()
@@ -132,7 +132,7 @@ if __name__ == '__main__':
                 df_shifted = df.shift(median_shifts[subject][motFile])
                 df_diff_squared = (df_shifted - df_gt).pow(2)
                 df_diff_squared = df_diff_squared.dropna()
-                df_diff_squared = df_diff_squared[df_diff_squared.columns[:df_diff_squared.columns.get_loc('lumbar_rotation')]]
+                df_diff_squared = df_diff_squared[df_diff_squared.columns[:df_diff_squared.columns.get_loc('lumbar_rotation')+1]]
                 df_diff_squared = df_diff_squared.drop(['pelvis_tx', 'pelvis_ty', 'pelvis_tz', "knee_angle_l_beta", "knee_angle_r_beta", "mtp_angle_l", "mtp_angle_r"], axis=1)
                 rmses[subject][motFile] = df_diff_squared.mean().pow(0.5)
 
@@ -143,11 +143,19 @@ if __name__ == '__main__':
     concatenated_rmses = pd.concat(list_of_rmses)
     grouped = concatenated_rmses.groupby(level=0)
     mean_rmses = grouped.mean()
+    # get columns of panda series
+    for col in mean_rmses.index.to_list():
+        if col.endswith("_r"):
+            mean_rmses[col[:-2]] = (mean_rmses[col] + mean_rmses[col[:-2] + "_l"]) / 2
+            mean_rmses = mean_rmses.drop(col)
+            mean_rmses = mean_rmses.drop(col[:-2] + "_l")
     # only keep 3 significant digits
     mean_rmses = mean_rmses.round(3)
+    # compute mean of columns which finish by _r and _l
+
     print("mean rmses: ", mean_rmses)
     # export to csv
-    mean_rmses.to_csv(os.path.join(args.output, 'mean_rmses.csv'))
+    mean_rmses.to_csv(os.path.join(args.output, args.pred_dir.split("/")[-1] + 'mean_rmses.csv'))
 
 
     # same but without the median shift
@@ -163,7 +171,7 @@ if __name__ == '__main__':
                 df = mot_to_df(mocapMotPath)
                 df_diff_squared = (df - df_gt).pow(2)
                 df_diff_squared = df_diff_squared.dropna()
-                df_diff_squared = df_diff_squared[df_diff_squared.columns[:df_diff_squared.columns.get_loc('lumbar_rotation')]]
+                df_diff_squared = df_diff_squared[df_diff_squared.columns[:df_diff_squared.columns.get_loc('lumbar_rotation')+1]]
                 df_diff_squared = df_diff_squared.drop(['pelvis_tx', 'pelvis_ty', 'pelvis_tz', "knee_angle_l_beta", "knee_angle_r_beta", "mtp_angle_l", "mtp_angle_r"], axis=1)
                 rmses[subject][motFile] = df_diff_squared.mean().pow(0.5)
 
@@ -173,11 +181,18 @@ if __name__ == '__main__':
     concatenated_rmses = pd.concat(list_of_rmses)
     grouped = concatenated_rmses.groupby(level=0)
     mean_rmses = grouped.mean()
+    for col in mean_rmses.index:
+        if col.endswith("_r"):
+            mean_rmses[col[:-2]] = (mean_rmses[col] + mean_rmses[col[:-2] + "_l"]) / 2
+            mean_rmses = mean_rmses.drop(col)
+            mean_rmses = mean_rmses.drop(col[:-2] + "_l")
     # only keep 3 significant digits
+
     mean_rmses = mean_rmses.round(3)
+
     print("mean_rmses_no_shift: ", mean_rmses)
     # export to csv
-    mean_rmses.to_csv(os.path.join(args.output, 'mean_rmses_no_shift.csv'))
+    mean_rmses.to_csv(os.path.join(args.output, args.pred_dir.split("/")[-1] + 'mean_rmses_no_shift.csv'))
 
 
 
