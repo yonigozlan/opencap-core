@@ -7,8 +7,8 @@ import os
 import numpy as np
 import pandas as pd
 
-# GT_PATH = "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data/"
-GT_PATH = "/scratch/users/yonigoz/OpenCap_data"
+GT_PATH = "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data/"
+# GT_PATH = "/scratch/users/yonigoz/OpenCap_data"
 
 def mot_to_df(motPath):
     # parse the mocap motion file
@@ -69,8 +69,9 @@ def get_best_shifts_for_metric(exercises_dict, metric):
 
                 lowest_mse = 100000
                 best_shift = 0
-                for shift in range(-100, 100):
+                for shift in range(-40, 40):
                     df_shifted = df.shift(shift)
+
                     df_diff = df_shifted - df_gt
                     df_diff = df_diff.dropna()
                     mse = df_diff[metric].abs().mean()
@@ -80,14 +81,20 @@ def get_best_shifts_for_metric(exercises_dict, metric):
                 # print(lowest_mse, best_shift)
                 best_shifts[subject][motFile] = (best_shift, lowest_mse)
 
-    return best_shifts
+    return best_shifts, df_dict
 
-def compute_median_shifts(best_shifts_list):
+def compute_median_shifts(best_shifts_list, df_dict):
     median_shifts = {subject: {} for subject in best_shifts_list[0]}
     for subject in best_shifts_list[0]:
         for motFile in best_shifts_list[0][subject]:
             shifts = [best_shift[subject][motFile][0] for best_shift in best_shifts_list]
-            median_shifts[subject][motFile] = int(sum(shifts) / len(shifts))
+            median_shifts[subject][motFile] = [int(sum(shifts) / len(shifts))]
+            df = df_dict[subject][motFile]["predicted"]
+            df_gt = df_dict[subject][motFile]["gt"]
+            df_shifted = df.shift(median_shifts[subject][motFile][0])
+            # compute number of frames overlapping before and after the shift
+            median_shifts[subject][motFile].append((df_shifted - df_gt).dropna().shape[0])
+            median_shifts[subject][motFile].append((df - df_gt).dropna().shape[0])
 
     return median_shifts
 
@@ -108,11 +115,11 @@ if __name__ == '__main__':
 
 
     exercises_dict = build_exercises_dict(GT_PATH, args.pred_dir)
-    best_shifts_r = get_best_shifts_for_metric(exercises_dict, "knee_angle_r")
-    best_shifts_l = get_best_shifts_for_metric(exercises_dict, "knee_angle_l")
+    best_shifts_r, df_dict = get_best_shifts_for_metric(exercises_dict, "knee_angle_r")
+    best_shifts_l, df_dict = get_best_shifts_for_metric(exercises_dict, "knee_angle_l")
     best_shifts = [best_shifts_r, best_shifts_l]
     best_shifts = [best_shifts_r, best_shifts_l]
-    median_shifts = compute_median_shifts(best_shifts)
+    median_shifts = compute_median_shifts(best_shifts, df_dict)
 
     with open(os.path.join(args.output, 'shifts.json'), 'w') as file:
         # format json
@@ -129,7 +136,7 @@ if __name__ == '__main__':
                 mocapMotPath = exercises_dict[subject][motFile]["predicted"]
                 df_gt = mot_to_df(mocapMotPath_gt)
                 df = mot_to_df(mocapMotPath)
-                df_shifted = df.shift(median_shifts[subject][motFile])
+                df_shifted = df.shift(median_shifts[subject][motFile][0])
                 df_diff_squared = (df_shifted - df_gt).pow(2)
                 df_diff_squared = df_diff_squared.dropna()
                 df_diff_squared = df_diff_squared[df_diff_squared.columns[:df_diff_squared.columns.get_loc('lumbar_rotation')+1]]
