@@ -7,8 +7,8 @@ import os
 import numpy as np
 import pandas as pd
 
-GT_PATH = "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data/"
-# GT_PATH = "/scratch/users/yonigoz/OpenCap_data"
+# GT_PATH = "/home/yoni/OneDrive_yonigoz@stanford.edu/RA/Code/OpenCap/data/"
+GT_PATH = "/scratch/users/yonigoz/OpenCap_data"
 
 def mot_to_df(motPath):
     # parse the mocap motion file
