@@ -35,7 +35,7 @@ config_base_local = {
     "batch_size_pose": 4,
     "useGTscaling": True,
     "marker_set": "Anatomical", # "Coco" or "Anatomical"
-    "alt_model": None,
+    "alt_model": "VirtualMarker",
 }
 config_base_local["model_ckpt_pose_absolute"] = os.path.join(config_base_local["mmposeDirectory"], config_base_local["model_ckpt_pose"])
 
@@ -56,7 +56,7 @@ config_base_sherlock = {
     "batch_size_pose": 2,
     "useGTscaling": True,
     "marker_set": "Anatomical",
-    "alt_model": None,
+    "alt_model": "VirtualMarker",
 }
 config_base_sherlock["model_ckpt_pose_absolute"] = config_base_sherlock["model_ckpt_pose"]
 
