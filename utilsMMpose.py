@@ -270,13 +270,13 @@ def pose_inference_updated(
                 for index_person in range(len(preds["bboxes"])):
                     bbox = preds["bboxes"][index_person]
                     kpts = preds["keypoints"][index_person]
-                    cv2.rectangle(
-                        img,
-                        (int(bbox[0]), int(bbox[1])),
-                        (int(bbox[2]), int(bbox[3])),
-                        (0, 255, 0),
-                        2,
-                    )
+                    # cv2.rectangle(
+                    #     img,
+                    #     (int(bbox[0]), int(bbox[1])),
+                    #     (int(bbox[2]), int(bbox[3])),
+                    #     (0, 255, 0),
+                    #     2,
+                    # )
                     for index_kpt in range(len(kpts)):
                         if index_kpt < 17:
                             color = (0, 0, 255)
@@ -295,7 +295,7 @@ def pose_inference_updated(
                         cv2.circle(
                             img,
                             (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
-                            3,
+                            4,
                             color,
                             -1,
                         )
@@ -307,19 +307,19 @@ def pose_inference_updated(
                 for index_person in range(len(preds["bboxes"])):
                     bbox = preds["bboxes"][index_person]
                     kpts = preds["keypoints"][index_person]
-                    cv2.rectangle(
-                        img,
-                        (int(bbox[0]), int(bbox[1])),
-                        (int(bbox[2]), int(bbox[3])),
-                        (0, 255, 0),
-                        2,
-                    )
+                    # cv2.rectangle(
+                    #     img,
+                    #     (int(bbox[0]), int(bbox[1])),
+                    #     (int(bbox[2]), int(bbox[3])),
+                    #     (0, 255, 0),
+                    #     2,
+                    # )
                     for index_kpt in range(len(getMMposeMarkerNames())):
                         color = (0, 0, 255)
                         cv2.circle(
                             img,
                             (int(kpts[index_kpt][0]), int(kpts[index_kpt][1])),
-                            3,
+                            4,
                             color,
                             -1,
                         )
