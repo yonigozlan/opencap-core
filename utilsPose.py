@@ -236,8 +236,6 @@ def pose_cliff_inference(
             img_w = batch["img_w"][i]
             focal_length = estimate_focal_length(img_h, img_w)
             bbox = batch["bbox"][i][0]
-            bbox[2] = bbox[0] + bbox[2]
-            bbox[3] = bbox[1] + bbox[3]
             img_rgb = batch["img"][i]
             norm_img, center, scale, crop_ul, crop_br, _ = process_image(img_rgb, bbox)
             results["norm_img"].append(norm_img)
