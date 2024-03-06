@@ -56,7 +56,7 @@ config_base_sherlock = {
     "batch_size_pose": 2,
     "useGTscaling": True,
     "marker_set": "Anatomical",
-    "alt_model": "VirtualMarker",
+    "alt_model": None,
 }
 config_base_sherlock["model_ckpt_pose_absolute"] = config_base_sherlock["model_ckpt_pose"]
 
